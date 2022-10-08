@@ -12,20 +12,23 @@
 ** and kick off the workflow component.
 **
 ************************************************************************/
-
+// include some library files
 #include <iostream>
 #include <stdio.h>
+#include "FileIO.h"
+// end libarary
 
+using namespace FileIO;
 using namespace std;
 
 int main(int argc, char *argv[]) {
     if (argc == 1) {
-        printf("No arguments were passed.\n");
+        printf("\nNo arguments were passed.\n");
+    } else if (argc == 4) {
+        FileIOManager fileIO(argv[1], argv[2], argv[3]);
+        fileIO.read();
     } else {
-        printf( "Arguments: " );
-            for ( int i = 1; i < argc; ++i ) {
-                    printf( "  %d. %s\n", i, argv[i] );
-                }
+        printf("\nWrong number of arguments\n");
     }
     return(0);
 }
