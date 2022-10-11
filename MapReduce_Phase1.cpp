@@ -23,12 +23,22 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     if (argc == 1) {
-        printf("\nNo arguments were passed.\n");
-    } else if (argc == 4) {
+        printf("No arguments were passed.  Using default values\n");
+        FileIOManager ().read();
+    } else if (argc == 2) {
+        printf("Only 1 argument passed.\nUsing passed arg as source dir\nand default values for temp and output dirs\n");
+        FileIOManager fileIO(argv[1]);
+        fileIO.read();
+
+    } else if (argc == 3) {
+        printf("Only 2 arguments passed.\nUsing passed args as source dir and temp dir\nand default values for output dir\n");
+        FileIOManager fileIO(argv[1], argv[2]);
+        fileIO.read();
+
+    } else if (argc >= 4) {
         FileIOManager fileIO(argv[1], argv[2], argv[3]);
         fileIO.read();
-    } else {
-        printf("\nWrong number of arguments\n");
     }
+
     return(0);
 }

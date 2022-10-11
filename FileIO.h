@@ -1,3 +1,5 @@
+#ifndef FileIO_H
+#define FileIO_H
 /************************************************************************
 ** FileIO.h
 **
@@ -13,24 +15,43 @@
 ** 
 ************************************************************************/
 
-#ifndef FileIO_H
-#define FileIO_H
-
+// include some library files
+#include <dirent.h>
 #include <string>
+#include <utility>
+// end library
+
 using namespace std;
 
-namespace FileIO
+namespace FileIO  // Using a cool namespace feature to keep member names from colliding
 {
     class FileIOManager {
     public:
+
+        // Various constructors
+        FileIOManager();                        
+        FileIOManager(string sourceDirArg);
+        FileIOManager(string sourceDirArg, string tempDirArg);        
         FileIOManager(string sourceDirArg, string tempDirArg, string outputDirArg);
-        string read();
-        string getSourceDir();// { return sourceDir; }
-        int toString();
-        int main();
+
+        // read() starts file IO operations and runs tokenizeFile()
+        void read();
+
+        // 2 getters for private data
+        string getSourceDir();  // { return sourceDir; }
+        string getTempDir();    // {return tempDir; }
+        string getOutputDir();  // { return outputDir; }
+
+        // every class should have a toString
+        int toString();         // Prints the values of the constructor arguments
+
     private:
+        // tokenizeFile() takes input stream(s) and creates a temp file
+        // with a list of all the words minus delimiters like " .!?;:\t\n" etc.
+        void tokenizeFile(ifstream&); // shakesFileArg);
+
+        // These variables hold the names of the directories for source, temp, and output
         string sourceDir, tempDir, outputDir;
     };
-} // namespace FileIO   
-
+} // namespace FileIO
 #endif
