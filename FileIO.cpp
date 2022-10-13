@@ -132,3 +132,66 @@ void FileIOManager::tokenizeFile(ifstream& shakesFileArg) {
 string FileIOManager::getSourceDir() { return sourceDir; }
 string FileIOManager::getTempDir() { return tempDir; }
 string FileIOManager::getOutputDir() { return outputDir; }
+
+
+// Implementations using std::filesystem
+
+//#include <string>
+//#include <filesystem>
+//#include <iostream>
+//#include <fstream>
+//#include "FileIO.h"
+//
+//
+//
+//// checker to ensure directories passed by user are valid
+//bool FileIO::check(std::string &dirPath) {
+//    const std::filesystem::path aPath{dirPath};
+//    if(std::filesystem::exists(aPath)){
+//        return true;
+//    }
+//    else
+//        return false;
+//
+//}
+//
+//// iterates over directory to populate vector with files housed within source directory
+//void FileIO::populateFiles() {
+//    std::cout << "directory_iterator:\n";
+//
+//    // directory_iterator can be iterated using a range-for loop
+//    for (auto const& dir_entry : std::filesystem::directory_iterator{sourceDir})
+//    {
+//        inputFiles.push_back(dir_entry.path()); //push filename onto vector
+//        std::cout << dir_entry.path() << '\n'; //line just for test
+//    }
+//    read(inputFiles.at(0));
+//
+//}
+//
+//// opens file, saves line by line to vector
+//void FileIO::read(std::filesystem::path &filePath) {
+//    std::ifstream in(filePath);
+//    std::string str;
+//    while (std::getline(in, str)){
+//        if(!str.empty()){
+//            tempFileLines.push_back(str);
+//        }
+//    }
+//    in.close();
+//    for (auto const& line : tempFileLines){
+//        std::cout<<line<<"\n";
+//    }
+//
+//}
+//
+//std::vector<std::string> FileIO::getTempFileLines() {
+//    return tempFileLines;
+//}
+//
+//// constructor
+//FileIO::FileIO(std::string & theSourceDir) {
+//    const std::filesystem::path aDir{theSourceDir};
+//    sourceDir = aDir;
+//}
+//

@@ -55,3 +55,33 @@ namespace FileIO  // Using a cool namespace feature to keep member names from co
     };
 } // namespace FileIO
 #endif
+
+
+//
+//#include <vector>
+//
+//class FileIO {
+//
+//public:
+//
+//    explicit FileIO(std::string &theSourceDir);
+//
+//    bool check(std::string &);
+//    void populateFiles();
+//    void read(std::filesystem::path&);
+//    std::vector<std::string> getTempFileLines();
+//
+//
+//
+//
+//private:
+//    std::filesystem::path sourceDir;
+//    std::filesystem::path tempDir;
+//    std::filesystem::path outputDir;
+//    std::vector<std::filesystem::path> inputFiles;
+//    std::vector<std::string> tempFileLines;
+//
+//};
+//
+//
+//#endif //OOD_TEST_FILEIO_H
