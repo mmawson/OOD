@@ -16,9 +16,9 @@
 ************************************************************************/
 
 // include some library files
-#include <dirent.h>
-#include <string>
 #include <utility>
+#include <filesystem>
+#include <vector>
 // end library
 
 using namespace std;
@@ -29,14 +29,23 @@ namespace FileIO  // Using a cool namespace feature to keep member names from co
     public:
 
         // Various constructors
-        FileIOManager();                        
-        FileIOManager(string sourceDirArg);
-        FileIOManager(string sourceDirArg, string tempDirArg);        
-        FileIOManager(string sourceDirArg, string tempDirArg, string outputDirArg);
+        explicit FileIOManager();                        
+        explicit FileIOManager(string sourceDirArg);
+        explicit FileIOManager(string sourceDirArg, string tempDirArg);        
+        explicit FileIOManager(string sourceDirArg, string tempDirArg, string outputDirArg);
 
-        // read() starts file IO operations and runs tokenizeFile()
-        void read();
+        // read() starts file IO operations
+        void read(std::filesystem::path&);
 
+        //  returns the file opened by read() to MapReduce_Phase1.cpp
+        std::vector<std::string> getTempFileLines();
+
+        // populates files
+        void populateFiles();
+
+        // Save tokenized text to file
+        void saveTemp(std::vector<std::string> &);
+        
         // 2 getters for private data
         string getSourceDir();  // { return sourceDir; }
         string getTempDir();    // {return tempDir; }
@@ -46,42 +55,15 @@ namespace FileIO  // Using a cool namespace feature to keep member names from co
         int toString();         // Prints the values of the constructor arguments
 
     private:
-        // tokenizeFile() takes input stream(s) and creates a temp file
-        // with a list of all the words minus delimiters like " .!?;:\t\n" etc.
-        void tokenizeFile(ifstream&); // shakesFileArg);
-
-        // These variables hold the names of the directories for source, temp, and output
-        string sourceDir, tempDir, outputDir;
+        bool check(string &);   // This is checker function to ensure directories passed by user are validfunction checks 
+        // member data
+        std::filesystem::path sourceDir;    // The Source Directory
+        std::filesystem::path tempDir;      // The Temporary Directory
+        std::filesystem::path outputDir;    // The Output Directory
+        std::vector<std::filesystem::path> inputFiles;  // this is a vector list of all files in sourceDir
+        std::vector<std::string> tempFileLines;     // This is the tokenized temp file vector
+                                                    // it holds all the words of the text in Shakespeare
+       
     };
 } // namespace FileIO
 #endif
-
-
-//
-//#include <vector>
-//
-//class FileIO {
-//
-//public:
-//
-//    explicit FileIO(std::string &theSourceDir);
-//
-//    bool check(std::string &);
-//    void populateFiles();
-//    void read(std::filesystem::path&);
-//    std::vector<std::string> getTempFileLines();
-//
-//
-//
-//
-//private:
-//    std::filesystem::path sourceDir;
-//    std::filesystem::path tempDir;
-//    std::filesystem::path outputDir;
-//    std::vector<std::filesystem::path> inputFiles;
-//    std::vector<std::string> tempFileLines;
-//
-//};
-//
-//
-//#endif //OOD_TEST_FILEIO_H

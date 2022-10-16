@@ -10,18 +10,13 @@
 ** 
 ** This class will handle reading (a) text file(s) containing
 ** the complete works of Shakespeare.  And also the intermediate
-** text output of the Map component as wells as the result of
-** Reduce
+** text output of the Map component.
+** 
 ** 
 ************************************************************************/
 #include <iostream>
+#include <filesystem>
 #include <fstream>
-#include <cstdio>
-#include <cerrno>
-#include <string>
-#include <cstring>
-#include <stdio.h>
-#include <dirent.h>
 #include "FileIO.h"
 
 using namespace std;
@@ -29,169 +24,131 @@ using namespace FileIO;  // This prevents our member functions from colliding wi
 
 // Begin constructor block
 // This default constructor is here just in case the user forgets to pass the 3 command line arguments
-FileIOManager::FileIOManager() {
-    sourceDir = "./text";
-    tempDir = "./temp";
-    outputDir = "./output";
+    FileIOManager::FileIOManager() {
+    sourceDir = filesystem::path("./text");
+    tempDir = filesystem::path("./temp");
+    outputDir = filesystem::path("./output");
 }
 
 FileIOManager::FileIOManager(string sourceDirArg) {
-    sourceDir = sourceDirArg;
-    tempDir = "./temp";
-    outputDir = "./output";
+    if (check(sourceDirArg)) {
+        const filesystem::path dir1 {sourceDirArg};
+        sourceDir = dir1;
+    } else {
+        cout << "Source directory argument error\nUsing default value\n";
+        sourceDir = filesystem::path("./text");
+    }
+
+    tempDir = filesystem::path("./temp");
+    outputDir = filesystem::path("./output");
 }
 
 FileIOManager::FileIOManager(string sourceDirArg, string tempDirArg) {
-    sourceDir = sourceDirArg;
-    tempDir = tempDirArg;
-    outputDir = "./output";
+    if (check(sourceDirArg)) {
+        const filesystem::path dir1 {sourceDirArg};
+        sourceDir = dir1;
+    } else {
+        cout << "Source directory argument error\nUsing default value\n";
+        sourceDir = filesystem::path("./text");
+    }
+    if (check(tempDirArg)) {
+        const filesystem::path dir2 {tempDirArg};
+        tempDir = dir2;
+    } else {
+        cout << "Temporary directory argument error\nUsing default value\n";
+        tempDir = filesystem::path("./temp");
+    }
+
+    outputDir = filesystem::path("./output");
 }
 
 FileIOManager::FileIOManager(string sourceDirArg, string tempDirArg, string outputDirArg) {
-    sourceDir = sourceDirArg;
-    tempDir = tempDirArg;
-    outputDir = outputDir;
+    if (check(sourceDirArg)) {
+        const filesystem::path dir1 {sourceDirArg};
+        sourceDir = dir1;
+    } else {
+        cout << "Source directory argument error\nUsing default value\n";
+        sourceDir = filesystem::path("./text");
+    }
+    if (check(tempDirArg)) {
+        const filesystem::path dir2 {tempDirArg};
+        tempDir = dir2;
+    } else {
+        cout << "Temporary directory argument error\nUsing default value\n";
+        tempDir = filesystem::path("./temp");
+    }
+        if (check(outputDirArg)) {
+        const filesystem::path dir3 {outputDirArg};
+        sourceDir = dir3;
+    } else {
+        cout << "Output directory argument error\nUsing default value\n";
+        sourceDir = filesystem::path("./output");
+    }
 }
-//  End constructor block
 
 
 // Every class should have a toString()
 int FileIOManager::toString() {
-        string outputStr = "\nSource directory: " + sourceDir + "\nTemp directory: " + tempDir + "\nOutput directory: " + outputDir + "\n";
+        string outputStr = "\nSource directory: " + sourceDir.string() + "\nTemp directory: " + tempDir.string() + "\nOutput directory: " + outputDir.string() + "\n";
         cout << outputStr;  
         return 0;
     }
 
-// read() starts file IO operations and runs tokenizeFile()
-void FileIOManager::read() 
-{
-    /************ This code opens all files in the source directory */
-    DIR *d = opendir(getSourceDir().c_str());
-    if ( ! d )
-    {
-        std::cout << "\nError accessing directory\n";
-    }
-    struct dirent **namelist;  // dirent contains the names of all files in the source dir
-    int n; // This is the number of files in source dir +2 (+ 1 for ./) and (1 for ../)
-    n = scandir(getSourceDir().c_str(), &namelist, NULL, alphasort); // scandir reterns n
-    if (n < 0) 
-        perror("scandir"); 
-    else {
-
-        // Setup a file stream to read The Collected Works of Shakespeare from a directory   
-        while (n > 2)           // This is an index into the namelist dirent
-                                // The first 2 values of n are ./ and ../
-        {
-            string shakesFileName = getSourceDir()+"/"+namelist[n-1]->d_name; // create a valid path to every file in source directory
-            ifstream shakesFile;  // create the ifstream
-            shakesFile.open(shakesFileName, std::ios_base::in);  // open files containing the collected works of Shakepeare
-            if ( shakesFile.is_open() ) {  // check if .open() worked
-                tokenizeFile(shakesFile);  // Turn the ifstream into words and write the words to file
-            } else 
-            {
-                cout << "\nError opening files\n";
-            }
-            shakesFile.close();     // cleanup
-    	    delete namelist[n-1]; 
-            n--;
-        } 
-        delete namelist;
-    }
+// checker to ensure directories passed by user are valid
+bool FileIOManager::check(std::string &dirPath) {
+   const std::filesystem::path aPath{dirPath};  //  Turn a path string into a filesystem::path
+   if(std::filesystem::exists(aPath)){          //  Check is path is valid
+       return true;                             //  return true if value
+   }
+   else
+       return false;                            //  return false if invalid
 }
 
-// tokenizeFile() takes an input stream and creates a temp file
-// with each word minus delimiters like " .!?;:\t\n" etc.
-void FileIOManager::tokenizeFile(ifstream& shakesFileArg) {
+// Iterates over directory to populate vector with files housed within source directory
+void FileIOManager::populateFiles() {
+   // directory_iterator can be iterated using a range-for loop
+   for (auto const& dir_entry : std::filesystem::directory_iterator{sourceDir})
+   {
+       inputFiles.push_back(dir_entry.path()); //push filename onto vector
+   }
+   for (int n = 0; n < inputFiles.size(); n++) {    // iterate through all files in sourceDir 
+    read(inputFiles.at(n));
+   }
+}
 
-    char delim[] = " ,.-+;!?<>:*\"/\\[]{}\t\n\r";  // These charachters will be removed from the input text
-    char oneline[120];  // Each line should be less than 120 charachters
-    char *token;        // Each *token is a word from the source text
+// This method reads a file passed as an argument
+// then it saves it, whole and entire, in a private arrary
+void FileIOManager::read(std::filesystem::path &filePath) {
+   std::ifstream in(filePath);      // create input stream
+   std::string str;                 // holds one line of input
+   while (std::getline(in, str)){   // gets one line of input and saves it in str
+       if(!str.empty()){
+           tempFileLines.push_back(str);    // place each string in a vector
+       }
+   }
+   in.close();  // close input stream
+}
 
-    // Setup a temp file to write each word from the collected works into a txt file
+// This method is called by MapReduce to save a vector (of Shakespeare word tokens)
+// into a temporary file
+void FileIOManager::saveTemp(std::vector<std::string> & tokenizedTempVector) {
     string shakesTempFile = getTempDir() + "/shakesTemp.txt";
     ofstream shakesWords;  // create the output stream
     shakesWords.open(shakesTempFile);  // give the output stream a file name
 
     if ( shakesWords.is_open() ) {  // check if .open() worked
-        string shakesString;
-        while (getline(shakesFileArg, shakesString)) {  // pull out each line the file one by one
-            strcpy(oneline,shakesString.c_str());       // oneline holds a line of text in string format 
-            token = strtok(oneline, delim);             // create a token pointer, with delimiters removed, created by strtok
-                                                        // *token points to the first word in oneline
-                while (token) {                         // cycle through each word one at a time
-                    shakesWords << token;               // write the word to output stream
-                    shakesWords << '\n';                // formating for output
-                    token = strtok(nullptr, delim);     // point token at the next word
-                }
-            }
+        for(int n = 0; n < tokenizedTempVector.size(); n++) {
+            shakesWords << tokenizedTempVector.at(n);
+        }
     }
-    shakesWords.close();  // cleanup
-} 
+    else {
+        cout << "\nCannot open " + shakesTempFile + "\n";
+    }
+    shakesWords.close();
+}
 
 // Getters for private variable data
 string FileIOManager::getSourceDir() { return sourceDir; }
 string FileIOManager::getTempDir() { return tempDir; }
 string FileIOManager::getOutputDir() { return outputDir; }
-
-
-// Implementations using std::filesystem
-
-//#include <string>
-//#include <filesystem>
-//#include <iostream>
-//#include <fstream>
-//#include "FileIO.h"
-//
-//
-//
-//// checker to ensure directories passed by user are valid
-//bool FileIO::check(std::string &dirPath) {
-//    const std::filesystem::path aPath{dirPath};
-//    if(std::filesystem::exists(aPath)){
-//        return true;
-//    }
-//    else
-//        return false;
-//
-//}
-//
-//// iterates over directory to populate vector with files housed within source directory
-//void FileIO::populateFiles() {
-//    std::cout << "directory_iterator:\n";
-//
-//    // directory_iterator can be iterated using a range-for loop
-//    for (auto const& dir_entry : std::filesystem::directory_iterator{sourceDir})
-//    {
-//        inputFiles.push_back(dir_entry.path()); //push filename onto vector
-//        std::cout << dir_entry.path() << '\n'; //line just for test
-//    }
-//    read(inputFiles.at(0));
-//
-//}
-//
-//// opens file, saves line by line to vector
-//void FileIO::read(std::filesystem::path &filePath) {
-//    std::ifstream in(filePath);
-//    std::string str;
-//    while (std::getline(in, str)){
-//        if(!str.empty()){
-//            tempFileLines.push_back(str);
-//        }
-//    }
-//    in.close();
-//    for (auto const& line : tempFileLines){
-//        std::cout<<line<<"\n";
-//    }
-//
-//}
-//
-//std::vector<std::string> FileIO::getTempFileLines() {
-//    return tempFileLines;
-//}
-//
-//// constructor
-//FileIO::FileIO(std::string & theSourceDir) {
-//    const std::filesystem::path aDir{theSourceDir};
-//    sourceDir = aDir;
-//}
-//
+std::vector<std::string> FileIOManager::getTempFileLines() { return tempFileLines; }

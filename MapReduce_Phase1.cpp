@@ -15,6 +15,7 @@
 // include some library files
 #include <iostream>
 #include <stdio.h>
+#include <filesystem>
 #include "FileIO.h"
 // end libarary
 
@@ -22,23 +23,34 @@ using namespace FileIO;
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    std::vector<std::string> shakesString;
     if (argc == 1) {
         printf("No arguments were passed.  Using default values\n");
-        FileIOManager ().read();
+        FileIOManager fileIO = FileIOManager();
+        fileIO.populateFiles();
+        shakesString = fileIO.getTempFileLines();
+        // Manipulate text
+        fileIO.saveTemp(shakesString);
     } else if (argc == 2) {
         printf("Only 1 argument passed.\nUsing passed arg as source dir\nand default values for temp and output dirs\n");
         FileIOManager fileIO(argv[1]);
-        fileIO.read();
-
+        fileIO.populateFiles();
+        shakesString = fileIO.getTempFileLines();
+        // Manipulate text
+        fileIO.saveTemp(shakesString);
     } else if (argc == 3) {
         printf("Only 2 arguments passed.\nUsing passed args as source dir and temp dir\nand default values for output dir\n");
         FileIOManager fileIO(argv[1], argv[2]);
-        fileIO.read();
-
+        fileIO.populateFiles();\
+        shakesString = fileIO.getTempFileLines();
+        // Manipulate text
+        fileIO.saveTemp(shakesString);
     } else if (argc >= 4) {
         FileIOManager fileIO(argv[1], argv[2], argv[3]);
-        fileIO.read();
+        fileIO.populateFiles();
+        shakesString = fileIO.getTempFileLines();
+        // Manipulate text
+        fileIO.saveTemp(shakesString);
     }
-
     return(0);
 }
