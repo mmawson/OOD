@@ -50,4 +50,5 @@ std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
     }
   }
 
+  return tokenizedLine;
 }
