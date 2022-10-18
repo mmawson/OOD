@@ -23,16 +23,14 @@
 
 using namespace std;
 
-namespace FileIO  // Using a cool namespace feature to keep member names from colliding
+namespace MapReduce  // Using a cool namespace feature to keep member names from colliding
 {
     class FileIOManager {
     public:
 
         // Various constructors
-        explicit FileIOManager();                        
-        explicit FileIOManager(string sourceDirArg);
-        explicit FileIOManager(string sourceDirArg, string tempDirArg);        
-        explicit FileIOManager(string sourceDirArg, string tempDirArg, string outputDirArg);
+        explicit FileIOManager();                            
+        explicit FileIOManager(filesystem::path sourceDirArg, std::filesystem::path tempDirArg, std::filesystem::path outputDirArg);
 
         // read() starts file IO operations
         void read(std::filesystem::path&);
@@ -47,15 +45,15 @@ namespace FileIO  // Using a cool namespace feature to keep member names from co
         void saveTemp(std::vector<std::string> &);
         
         // 2 getters for private data
-        string getSourceDir();  // { return sourceDir; }
-        string getTempDir();    // {return tempDir; }
-        string getOutputDir();  // { return outputDir; }
+        std::filesystem::path getSourceDir();  // { return sourceDir; }
+        std::filesystem::path getTempDir();    // {return tempDir; }
+        std::filesystem::path getOutputDir();  // { return outputDir; }
 
         // every class should have a toString
         int toString();         // Prints the values of the constructor arguments
 
     private:
-        bool check(string &);   // This is checker function to ensure directories passed by user are validfunction checks 
+        bool check(std::filesystem::path);   // This is checker function to ensure directories passed by user are validfunction checks 
         // member data
         std::filesystem::path sourceDir;    // The Source Directory
         std::filesystem::path tempDir;      // The Temporary Directory
