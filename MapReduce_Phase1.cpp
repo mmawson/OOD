@@ -19,38 +19,42 @@
 #include "FileIO.h"
 // end libarary
 
-using namespace FileIO;
+using namespace MapReduce;
 using namespace std;
 
 int main(int argc, char *argv[]) {
     std::vector<std::string> shakesString;
-    if (argc == 1) {
-        printf("No arguments were passed.  Using default values\n");
-        FileIOManager fileIO = FileIOManager();
-        fileIO.populateFiles();
-        shakesString = fileIO.getTempFileLines();
-        // Manipulate text
-        fileIO.saveTemp(shakesString);
-    } else if (argc == 2) {
-        printf("Only 1 argument passed.\nUsing passed arg as source dir\nand default values for temp and output dirs\n");
-        FileIOManager fileIO(argv[1]);
-        fileIO.populateFiles();
-        shakesString = fileIO.getTempFileLines();
-        // Manipulate text
-        fileIO.saveTemp(shakesString);
-    } else if (argc == 3) {
-        printf("Only 2 arguments passed.\nUsing passed args as source dir and temp dir\nand default values for output dir\n");
-        FileIOManager fileIO(argv[1], argv[2]);
-        fileIO.populateFiles();\
-        shakesString = fileIO.getTempFileLines();
-        // Manipulate text
-        fileIO.saveTemp(shakesString);
-    } else if (argc >= 4) {
-        FileIOManager fileIO(argv[1], argv[2], argv[3]);
-        fileIO.populateFiles();
-        shakesString = fileIO.getTempFileLines();
-        // Manipulate text
-        fileIO.saveTemp(shakesString);
+    std::filesystem::path dir1, dir2, dir3;
+
+    switch(argc) {
+    case 1 :
+        dir1 = filesystem::path("./text");
+        dir2 = filesystem::path("./temp");
+        dir3 = filesystem::path("./output");
+        break;
+    case 2 :
+        dir1 = filesystem::path(argv[1]);
+        dir2 = filesystem::path("./temp");
+        dir3 = filesystem::path("./output");
+        break;
+    case 3 :
+        dir1 = filesystem::path(argv[1]);
+        dir2 = filesystem::path(argv[2]);
+        dir3 = filesystem::path("./output");
+        break;
+    default :
+        dir1 = filesystem::path(argv[1]);
+        dir2 = filesystem::path(argv[2]);
+        dir3 = filesystem::path(argv[3]);
+        break;
     }
-    return(0);
+    FileIOManager fileIO(dir1, dir2, dir3);
+    fileIO.toString();
+    fileIO.populateFiles();
+    shakesString = fileIO.getTempFileLines();
+    // Manipulate text
+    fileIO.saveTemp(shakesString);
+    // Reduce
+
+    return(0);  
 }
