@@ -13,6 +13,7 @@
 #include "Map.hpp"
 #include "FileIO.h"
 #include <cctype>
+#include <vector>
 
 Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) : mFileIOMgr(fileIOMgr), mOutputFileName(outputFile)
 {
