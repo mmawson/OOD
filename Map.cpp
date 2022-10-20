@@ -15,6 +15,9 @@
 #include <cctype>
 #include <vector>
 
+namespace MapReduce
+{
+
 Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) : mFileIOMgr(fileIOMgr), mOutputFileName(outputFile)
 {
   
@@ -24,12 +27,15 @@ void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
 {
   std::vector<std::string> tokenizedData;
 
-  for (std::string& line : inputLines)
+  for (const std::string& line : inputLines)
   {
-    tokenizedData.push_back(tokenizeLine(line));
+    for (const std::string& token : tokenizeLine(line))
+    {
+      tokenizedData.push_back(token);
+    }
   }
 
-  mFileIOMgr.saveTemp(tokenizedData);
+  mFileIOMgr->saveTemp(tokenizedData);
 }
 
 std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
@@ -40,16 +46,18 @@ std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
   std::string token = "";
   for (int i = 0; i < lineStr.size(); ++i)
   {
-    if (lineStr[i].isspace() && token != "") 
+    if (std::isspace(lineStr[i]) && token != "") 
     {
       tokenizedLine.push_back("(\"" + token + "\", 1)");
       token = "";
     }
-    else if (!lineStr[i].ispunct() && !lineStr[i].isspace())
+    else if (!std::ispunct(lineStr[i]) && !std::isspace(lineStr[i]))
     {
-      token += lineStr[i].tolower();
+      token += std::tolower(lineStr[i]);
     }
   }
 
   return tokenizedLine;
 }
+
+} //namespace MapReduce

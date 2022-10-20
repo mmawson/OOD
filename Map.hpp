@@ -16,6 +16,10 @@
 #include <vector>
 #include <memory>
 
+namespace MapReduce
+{
+
+
 //Forward declaration
 class FileIOManager;
 
@@ -32,3 +36,5 @@ private:
   std::string mOutputFileName;
 
 };
+
+} //namespace MapReduce

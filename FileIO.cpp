@@ -123,7 +123,7 @@ void FileIOManager::saveTemp(std::vector<std::string> & tokenizedTempVector) {
 }
 
 // Getters for private variable data
-filesystem::path FileIOManager::getSourceDir() { return sourceDir; }
+FileIO.cppfilesystem::path FileIOManager::getSourceDir() { return sourceDir; }
 filesystem::path FileIOManager::getTempDir() { return tempDir; }
 filesystem::path FileIOManager::getOutputDir() { return outputDir; }
 std::vector<std::string> FileIOManager::getTempFileLines() { return tempFileLines; }

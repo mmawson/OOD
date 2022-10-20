@@ -43,7 +43,7 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         void populateFiles();
 
         // Save tokenized text to file
-        void saveTemp(std::vector<std::string> &);
+        void saveTemp(std::vector<std::string> & tokenizedTempVector);
         
         // 2 getters for private data
         std::filesystem::path getSourceDir();  // { return sourceDir; }
@@ -64,5 +64,5 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
                                                     // it holds all the words of the text in Shakespeare
        
     };
-} // namespace FileIO
+} // namespace MapReduce
 #endif
