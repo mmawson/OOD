@@ -11,6 +11,8 @@
 ************************************************************************/
 
 #include "Reduce.h"
+#include <fstream>
+#include <map>
 
 Reduce::Reduce() {
 
@@ -24,15 +26,14 @@ void Reduce::reduceFile(std::filesystem::path & inputFile, std::vector<std::stri
 
 }
 
-void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile, std::map<std::string, int> holdingMap) {
-    std::ifstream in(filePath);      // create input stream
+void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile, std::map<std::string, std::vector<int>> holdingMap) {
+    std::ifstream in(inputFile);      // create input stream
+    int value;
+    std::string key;
     if (!in.is_open())
         return;
-    for (std::string key; std::getline(in, key, ','); in.get()) {
-        int num;
-
-        in >> num;
-        holdingMap[key] = num;
+    while (std::getline(in, key,',') && in >> value){
+        holdingMap[key].push_back(value);
     }
     in.close();  // close input stream
 }

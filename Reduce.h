@@ -26,7 +26,7 @@ public:
 
     explicit Reduce();
     void reduceFile(std::filesystem::path&, std::vector<std::string>, MapReduce::FileIOManager);
-    void sortMap(MapReduce::FileIOManager, std::filesystem::path, std::map<std::string,int>);
+    void sortMap(MapReduce::FileIOManager, std::filesystem::path, std::map<std::string, std::vector<int>>);
 
 private:
     std::vector <std::string> reduceTemp;
