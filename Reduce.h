@@ -25,11 +25,13 @@ class Reduce {
 public:
 
     explicit Reduce();
-    void reduceFile(std::filesystem::path&, std::vector<std::string>, MapReduce::FileIOManager);
-    void sortMap(MapReduce::FileIOManager, std::filesystem::path, std::map<std::string, std::vector<int>>);
+    void sortMap(MapReduce::FileIOManager, std::filesystem::path);
+    void reduceFile();
+    void writeReduce(filesystem::path outputFile);
 
 private:
-    std::vector <std::string> reduceTemp;
+    std::map <std::string, int> reduceTemp;
+    std::map<std::string, std::vector<int>> holdingMap;
 
 
 

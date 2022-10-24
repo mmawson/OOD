@@ -12,21 +12,15 @@
 
 #include "Reduce.h"
 #include <fstream>
+#include <ostream>
 #include <map>
 
 Reduce::Reduce() {
 
 }
 
-void Reduce::reduceFile(std::filesystem::path & inputFile, std::vector<std::string> holdingPen, MapReduce::FileIOManager FileMgr) {
 
-    FileMgr.read(inputFile, holdingPen); //need fileIO read function to take vector as second argument
-
-
-
-}
-
-void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile, std::map<std::string, std::vector<int>> holdingMap) {
+void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile) {
     std::ifstream in(inputFile);      // create input stream
     int value;
     std::string key;
@@ -40,5 +34,24 @@ void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inp
 
 
 void Reduce::reduceFile() {
+    int count = 0;
+    std::string key;
+    for( auto const  &ent1 : holdingMap){
+        key = ent1.first;
+        for(auto &itr : ent1.second){
+            count++;
+        }
+        reduceTemp.insert_or_assign(key,count);
+    }
+}
+
+void Reduce::writeReduce(std::filesystem::path outputFile){
+    ofstream finalReduce;
+    finalReduce.open(outputFile);
+    if (finalReduce.is_open()){
+        for (const auto& [key, value]: reduceTemp )
+            finalReduce << key << " " << value;
+    }
+
 
 }

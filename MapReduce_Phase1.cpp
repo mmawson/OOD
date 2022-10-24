@@ -17,6 +17,9 @@
 #include <stdio.h>
 #include <filesystem>
 #include "FileIO.h"
+#include <Map.hpp>
+#include <Reduce.h>
+
 // end libarary
 
 using namespace MapReduce;
@@ -51,10 +54,20 @@ int main(int argc, char *argv[]) {
     FileIOManager fileIO(dir1, dir2, dir3);
     fileIO.toString();
     fileIO.populateFiles();
-    shakesString = fileIO.getTempFileLines();
+//    shakesString = fileIO.getTempFileLines();
     // Manipulate text
-    fileIO.saveTemp(shakesString);
-    // Reduce
+//    fileIO.saveTemp(shakesString);
+    // Map
+    Map map1(static_cast<shared_ptr<FileIOManager>>(&fileIO), fileIO.getTempDir());
+    map1.mapToOutputFile(fileIO.getTempFileLines());
+
+// Reduce
+    Reduce reduce1;
+    reduce1.sortMap(fileIO,fileIO.getTempDir());
+    reduce1.reduceFile();
+    reduce1.writeReduce(fileIO.getOutputDir());
+
+
 
     return(0);  
 }
