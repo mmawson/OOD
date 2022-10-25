@@ -58,7 +58,8 @@ int main(int argc, char *argv[]) {
     // Manipulate text
 //    fileIO.saveTemp(shakesString);
     // Map
-    Map map1(static_cast<shared_ptr<FileIOManager>>(&fileIO), fileIO.getTempDir());
+    auto filePtr = make_shared<FileIOManager>(fileIO); // create shared pointer to pass to map object
+    Map map1(filePtr, fileIO.getTempDir());
     map1.mapToOutputFile(fileIO.getTempFileLines());
 
 // Reduce
