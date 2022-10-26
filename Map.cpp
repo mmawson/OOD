@@ -14,6 +14,7 @@
 #include "FileIO.h"
 #include <cctype>
 #include <vector>
+#include <iostream>
 
 namespace MapReduce
 {
@@ -57,6 +58,12 @@ std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
     }
   }
 
+  //Push last word
+  if (token != "")
+  {
+      tokenizedLine.push_back("(\"" + token + "\", 1)");
+  }
+ 
   return tokenizedLine;
 }
 

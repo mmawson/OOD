@@ -52,14 +52,13 @@ void Reduce::reduceFile() {
         for(auto &itr : ent1.second){
             count++;
         }
-        std::cout << "KEY IS " << key << std::endl;
         reduceTemp.insert_or_assign(key,count);
     }
 }
 
 void Reduce::writeReduce(std::filesystem::path outputFile){
     ofstream finalReduce;
-    finalReduce.open(outputFile.string()+"/foo.bar");
+    finalReduce.open(outputFile.string()+"/output.txt");
     if (finalReduce.is_open())
     {
     for (const auto& [key, value]: reduceTemp )
