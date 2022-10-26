@@ -38,6 +38,7 @@ void Reduce::reduceFile() {
     int count = 0;
     std::string key;
     for( auto const  &ent1 : holdingMap){
+        count = 0;
         key = ent1.first;
         for(auto &itr : ent1.second){
             count++;
