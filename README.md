@@ -9,10 +9,33 @@ This file can evolve as classes and workflow are added
 ```mermaid
 classDiagram
     class FileIO{
+        std::filesystem::path sourceDir
+        std::filesystem::path tempDir
+        std::filesystem::path outputDir
+        std::vector<std::filesystem::path> inputFiles
+        std::vector<std::string> tempFileLines
+        void read(std::filesystem::path&)
+        std::vector<std::string> getTempFileLines()
+        void populateFiles()
+        void saveTemp(std::vector<std::string> & tokenizedTempVector)
+        std::filesystem::path getSourceDir()
+        std::filesystem::path getTempDir()
+        std::filesystem::path getOutputDir()
+        int toString()         
     }
     class Map{
+        std::shared_ptr<FileIOManager> mFileIOMgr
+        std::string mOutputFileName
+        void mapToOutputFile(const std::vector<std::string>& inputLines)
+        std::vector<std::string> tokenizeLine(const std::string& lineStr)
     }
     class Reduce{
+        std::vector<std::string> tokenizeLine(const std::string& lineStr)
+        std::shared_ptr<FileIOManager> mFileIOMgr
+        std::string mOutputFileName
+        void sortMap(MapReduce::FileIOManager, std::filesystem::path)
+        void reduceFile()
+        void writeReduce(filesystem::path outputFile)
     }
 ```
 
