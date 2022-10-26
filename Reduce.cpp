@@ -28,7 +28,16 @@ void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inp
     if (!in.is_open())
         return;
     while (std::getline(in, key,',') && in >> value){
-        holdingMap[key].push_back(value);
+        //Sanitize the key, removing parens
+        std::string newKey = "";
+        for (size_t i = 0; i < key.size(); ++i)
+        {
+            if (key[i] != '(' && key[i] != ')')
+            {
+                newKey += key[i];
+            }
+        }
+        holdingMap[newKey].push_back(value);
     }
     in.close();  // close input stream
 }
@@ -43,6 +52,7 @@ void Reduce::reduceFile() {
         for(auto &itr : ent1.second){
             count++;
         }
+        std::cout << "KEY IS " << key << std::endl;
         reduceTemp.insert_or_assign(key,count);
     }
 }
@@ -54,8 +64,7 @@ void Reduce::writeReduce(std::filesystem::path outputFile){
     {
     for (const auto& [key, value]: reduceTemp )
     {
-        cout << key << " " << value;
-        finalReduce << key << " " << value;
+        finalReduce << "(" << key << ", " << value << ")";
     }
     finalReduce.close();
     }
