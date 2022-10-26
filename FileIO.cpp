@@ -114,10 +114,6 @@ void FileIOManager::saveTemp(std::vector<std::string> & tokenizedTempVector) {
     if ( shakesWords.is_open() ) {  // check if .open() worked
         for(int n = 0; n < tokenizedTempVector.size(); n++) {
             shakesWords << tokenizedTempVector.at(n);
-            if (n != tokenizedTempVector.size() - 1)
-            {
-                shakesWords << ", ";
-            }
         }
     }
     else {
