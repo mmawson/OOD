@@ -13,6 +13,7 @@
 #include "Reduce.h"
 #include <fstream>
 #include <ostream>
+#include <iostream>
 #include <map>
 
 Reduce::Reduce() {
@@ -21,7 +22,7 @@ Reduce::Reduce() {
 
 
 void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile) {
-    std::ifstream in(inputFile);      // create input stream
+    std::ifstream in(inputFile.string()+"/shakesTemp.txt");      // create input stream
     int value;
     std::string key;
     if (!in.is_open())
@@ -47,11 +48,14 @@ void Reduce::reduceFile() {
 
 void Reduce::writeReduce(std::filesystem::path outputFile){
     ofstream finalReduce;
-    finalReduce.open(outputFile);
-    if (finalReduce.is_open()){
-        for (const auto& [key, value]: reduceTemp )
-            finalReduce << key << " " << value;
+    finalReduce.open(outputFile.string()+"/foo.bar");
+    if (finalReduce.is_open())
+    {
+    for (const auto& [key, value]: reduceTemp )
+    {
+        cout << key << " " << value;
+        finalReduce << key << " " << value;
     }
-
-
+    finalReduce.close();
+    }
 }

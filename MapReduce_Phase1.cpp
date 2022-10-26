@@ -17,8 +17,8 @@
 #include <stdio.h>
 #include <filesystem>
 #include "FileIO.h"
-#include <Map.hpp>
-#include <Reduce.h>
+#include "Map.h"
+#include "Reduce.h"
 
 // end libarary
 

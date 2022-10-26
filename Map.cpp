@@ -10,7 +10,7 @@
 ** text lines passed to it and properly format them for the Reduce class to use
 ************************************************************************/
 
-#include "Map.hpp"
+#include "Map.h"
 #include "FileIO.h"
 #include <cctype>
 #include <vector>
