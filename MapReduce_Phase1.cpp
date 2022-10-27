@@ -2,7 +2,8 @@
 ** MapReduce_Phase1.cpp
 **
 ** Created for CSE Object Oriented Design Project #1
-** Team members are Matt Mawson (mmawson@syr.edu), Bryan Sweeney (bdsweene@syr.edu),
+** Team name: ASCII Dragons
+** Members are Matt Mawson (mmawson@syr.edu), Bryan Sweeney (bdsweene@syr.edu),
 ** and Craig Mitchell (cmitch04@syr.edu)
 ** Started on 10/6/2022 at 12:00 AM
 **
@@ -11,7 +12,35 @@
 ** This component will handle all the command-line options
 ** and kick off the workflow component.
 **
-************************************************************************/
+************************************************************************
+             __                  __
+            ( _)                ( _)
+           / / \\              / /\_\_
+          / /   \\            / / | \ \
+         / /     \\          / /  |\ \ \
+        /  /   ,  \ ,       / /   /|  \ \
+       /  /    |\_ /|      / /   / \   \_\
+      /  /  |\/ _ '_| \   / /   /   \    \\
+     |  /   |/  0 \0\    / |    |    \    \\
+     |    |\|      \_\_ /  /    |     \    \\
+     |  | |/    \.\ o\o)  /      \     |    \\
+     \    |     /\\`v-v  /        |    |     \\
+      | \/    /_| \\_|  /         |    | \    \\
+      | |    /__/_ `-` /   _____  |    |  \    \\
+      \|    [__]  \_/  |_________  \   |   \    ()
+       /    [___] (    \         \  |\ |   |   //
+      |    [___]                  |\| \|   /  |/
+     /|    [____]                  \  |/\ / / ||
+    (  \   [____ /     ) _\      \  \    \| | ||
+     \  \  [_____|    / /     __/    \   / / //
+     |   \ [_____/   / /        \    |   \/ //
+     |   /  '----|   /=\____   _/    |   / //
+  __ /  /        |  /   ___/  _/\    \  | ||
+ (/-(/-\)       /   \  (/\/\)/  |    /  | /
+               (/\/\)           /   /   //
+                      _________/   /    /
+                     \____________/    (
+*/
 // include some library files
 #include <iostream>
 #include <stdio.h>
