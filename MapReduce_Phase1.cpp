@@ -40,7 +40,9 @@
                (/\/\)           /   /   //
                       _________/   /    /
                      \____________/    (
+Art by Shanaka Dias
 */
+
 // include some library files
 #include <iostream>
 #include <stdio.h>
