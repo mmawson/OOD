@@ -25,15 +25,13 @@ class FileIOManager;
 
 class Map {
 public:
-  Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile);
+  Map(std::shared_ptr<FileIOManager> fileIOMgr);
 
   void mapToOutputFile(const std::vector<std::string>& inputLines);
 
 private:
   std::vector<std::string> tokenizeLine(const std::string& lineStr);
-
   std::shared_ptr<FileIOManager> mFileIOMgr;
-  std::string mOutputFileName;
 
 };
 

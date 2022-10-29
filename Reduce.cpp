@@ -10,19 +10,22 @@
 ** text lines passed to it and tabulate into a count of instances which is saved to disk
 ************************************************************************/
 
-#include "Reduce.h"
+#include "Reduce.hpp"
+#include "FileIO.hpp"
 #include <fstream>
 #include <ostream>
 #include <iostream>
 #include <map>
+#include <string>
+#include <vector>
+#include <memory>
 
-Reduce::Reduce() {
+namespace MapReduce {
 
-}
+Reduce::Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr) : rFileIOMgr(fileIOMgr) {}
 
-
-void Reduce::sortMap(MapReduce::FileIOManager FileMgr, std::filesystem::path inputFile) {
-    std::ifstream in(inputFile.string()+"/shakesTemp.txt");      // create input stream
+void Reduce::sortMap() {
+    std::ifstream in(rFileIOMgr->getTempDir().string()+"/shakesTemp.txt");      // create input stream
     int value;
     std::string key;
     if (!in.is_open())
@@ -56,15 +59,12 @@ void Reduce::reduceFile() {
     }
 }
 
-void Reduce::writeReduce(std::filesystem::path outputFile){
-    ofstream finalReduce;
-    finalReduce.open(outputFile.string()+"/output.txt");
-    if (finalReduce.is_open())
-    {
+void Reduce::writeReduce(){
+    std::vector<std::string> finalReduce;
     for (const auto& [key, value]: reduceTemp )
     {
-        finalReduce << "(" << key << ", " << value << ")";
+        finalReduce.push_back("(" + key + ", " + std::to_string(value) + ")");
     }
-    finalReduce.close();
+    rFileIOMgr->save(finalReduce, "result.txt", rFileIOMgr->getOutputDir());
     }
 }

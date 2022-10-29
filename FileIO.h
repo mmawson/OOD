@@ -43,8 +43,7 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         void populateFiles();
 
         // Save tokenized text to file
-        void saveTemp(std::vector<std::string> & tokenizedTempVector);
-        
+        void save(std::vector<std::string> & tokenizedTempVector, string, std::filesystem::path);
         // 2 getters for private data
         std::filesystem::path getSourceDir();  // { return sourceDir; }
         std::filesystem::path getTempDir();    // {return tempDir; }

@@ -18,7 +18,7 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
-#include "FileIO.h"
+#include "FileIO.hpp"
 
 using namespace std;
 using namespace MapReduce;  // This prevents our member functions from colliding with other functs with the same name
@@ -106,10 +106,10 @@ void FileIOManager::read(std::filesystem::path &filePath) {
 
 // This method is called by MapReduce to save a vector (of Shakespeare word tokens)
 // into a temporary file
-void FileIOManager::saveTemp(std::vector<std::string> & tokenizedTempVector) {
-    string shakesTempFile = getTempDir().string() + "/shakesTemp.txt";
+void FileIOManager::save(std::vector<std::string> & tokenizedTempVector, string filename, std::filesystem::path directory) {
+    string shakesFile = directory.string() + "/" + filename;
     ofstream shakesWords;  // create the output stream
-    shakesWords.open(shakesTempFile);  // give the output stream a file name
+    shakesWords.open(shakesFile);  // give the output stream a file name
 
     if ( shakesWords.is_open() ) {  // check if .open() worked
         for(int n = 0; n < tokenizedTempVector.size(); n++) {
@@ -117,7 +117,7 @@ void FileIOManager::saveTemp(std::vector<std::string> & tokenizedTempVector) {
         }
     }
     else {
-        cout << "\nCannot open " + shakesTempFile + "\n";
+        cout << "\nCannot open " + shakesFile + "\n";
     }
     shakesWords.close();
 }

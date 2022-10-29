@@ -16,26 +16,30 @@
 
 #include <string>
 #include <vector>
-#include <filesystem>
+#include <memory>
 #include <map>
-#include "FileIO.h"
+namespace MapReduce {
+
+//forward declaration
+class FileIOManager;
 
 class Reduce {
 
 public:
 
-    explicit Reduce();
-    void sortMap(MapReduce::FileIOManager, std::filesystem::path);
+    Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr);
+    void sortMap();
     void reduceFile();
-    void writeReduce(filesystem::path outputFile);
+    void writeReduce();
 
 private:
+    std::shared_ptr<MapReduce::FileIOManager> rFileIOMgr;
     std::map <std::string, int> reduceTemp;
     std::map<std::string, std::vector<int>> holdingMap;
 
 
 
 };
-
+}
 
 #endif //OOD_PROJECT1_REDUCE_H

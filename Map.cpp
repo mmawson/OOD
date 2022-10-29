@@ -10,8 +10,8 @@
 ** text lines passed to it and properly format them for the Reduce class to use
 ************************************************************************/
 
-#include "Map.h"
-#include "FileIO.h"
+#include "Map.hpp"
+#include "FileIO.hpp"
 #include <cctype>
 #include <vector>
 #include <iostream>
@@ -19,7 +19,7 @@
 namespace MapReduce
 {
 
-Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) : mFileIOMgr(fileIOMgr), mOutputFileName(outputFile)
+Map::Map(std::shared_ptr<FileIOManager> fileIOMgr) : mFileIOMgr(fileIOMgr)
 {
   
 }
@@ -36,7 +36,7 @@ void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
     }
   }
 
-  mFileIOMgr->saveTemp(tokenizedData);
+  mFileIOMgr->save(tokenizedData, "shakesTemp.txt", mFileIOMgr->getTempDir());
 }
 
 std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
