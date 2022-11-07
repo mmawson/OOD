@@ -19,7 +19,7 @@
 namespace MapReduce
 {
 
-Map::Map(std::shared_ptr<FileIOManager> fileIOMgr) : mFileIOMgr(fileIOMgr)
+Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) : mFileIOMgr(fileIOMgr), mOutputFile(outputFile)
 {
   
 }
@@ -36,7 +36,7 @@ void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
     }
   }
 
-  mFileIOMgr->save(tokenizedData, "shakesTemp.txt", mFileIOMgr->getTempDir());
+  mFileIOMgr->save(tokenizedData, mOutputFile, mFileIOMgr->getTempDir());
 }
 
 std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)

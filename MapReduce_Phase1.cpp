@@ -92,9 +92,10 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
                              // saves the contents in a private string vector (tempFileLines) using a call to FileIOManager::read()
                              // Now all the plays, poems, and sonnets are in one large string vector 
 
+    const std::string mapOutputFile = "shakesTemp.txt";
     // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
     auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
-    Map map1(filePtr);             // create a map object with a handel to the FileIOManager
+    Map map1(filePtr, mapOutputFile);             // create a map object with a handel to the FileIOManager
     map1.mapToOutputFile(fileIO.getTempFileLines());    // pass the private tempFileLines vector to the Map, map1
                                                         // This will tokenize tempFileLines in the format ("token1",1),("token2",1), etc.
                                                         // mapToOutputFile then calls FileIOManager->saveTemp(tokenizedData)
