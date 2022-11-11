@@ -122,8 +122,31 @@ void FileIOManager::save(std::vector<std::string> & tokenizedTempVector, string 
     shakesWords.close();
 }
 
+
+void FileIOManager::sortMap() {
+    std::ifstream in(getTempDir().string()+"/shakesTemp.txt");      // create input stream
+    int value;
+    std::string key;
+    if (!in.is_open())
+        return;
+    while (std::getline(in, key,',') && in >> value){
+        //Sanitize the key, removing parens
+        std::string newKey = "";
+        for (size_t i = 0; i < key.size(); ++i)
+        {
+            if (key[i] != '(' && key[i] != ')')
+            {
+                newKey += key[i];
+            }
+        }
+        holdingMap[newKey].push_back(value);
+    }
+    in.close();  // close input stream
+}
+
 // Getters for private variable data
 filesystem::path FileIOManager::getSourceDir() { return sourceDir; }
 filesystem::path FileIOManager::getTempDir() { return tempDir; }
 filesystem::path FileIOManager::getOutputDir() { return outputDir; }
 std::vector<std::string> FileIOManager::getTempFileLines() { return tempFileLines; }
+std::map<std::string, std::vector<int>> FileIOManager::getHoldingMap() { return holdingMap;}

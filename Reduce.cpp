@@ -24,32 +24,32 @@ namespace MapReduce {
 
 Reduce::Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr) : rFileIOMgr(fileIOMgr) {}
 
-void Reduce::sortMap() {
-    std::ifstream in(rFileIOMgr->getTempDir().string()+"/shakesTemp.txt");      // create input stream
-    int value;
-    std::string key;
-    if (!in.is_open())
-        return;
-    while (std::getline(in, key,',') && in >> value){
-        //Sanitize the key, removing parens
-        std::string newKey = "";
-        for (size_t i = 0; i < key.size(); ++i)
-        {
-            if (key[i] != '(' && key[i] != ')')
-            {
-                newKey += key[i];
-            }
-        }
-        holdingMap[newKey].push_back(value);
-    }
-    in.close();  // close input stream
-}
+//void Reduce::sortMap() {
+//    std::ifstream in(rFileIOMgr->getTempDir().string()+"/shakesTemp.txt");      // create input stream
+//    int value;
+//    std::string key;
+//    if (!in.is_open())
+//        return;
+//    while (std::getline(in, key,',') && in >> value){
+//        //Sanitize the key, removing parens
+//        std::string newKey = "";
+//        for (size_t i = 0; i < key.size(); ++i)
+//        {
+//            if (key[i] != '(' && key[i] != ')')
+//            {
+//                newKey += key[i];
+//            }
+//        }
+//        holdingMap[newKey].push_back(value);
+//    }
+//    in.close();  // close input stream
+//}
 
 
-void Reduce::reduceFile() {
+void Reduce::reduceFile(std::map<std::string, std::vector<int>> newHoldingMap) {
     int count = 0;
     std::string key;
-    for( auto const  &ent1 : holdingMap){
+    for( auto const  &ent1 : newHoldingMap){
         count = 0;
         key = ent1.first;
         for(auto &itr : ent1.second){

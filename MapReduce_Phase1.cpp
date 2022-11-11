@@ -102,10 +102,11 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
                                                         // which creates ./temp/shakesTemp.txt (or whatever temp directory you passed). 
 
 // Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
-    Reduce reduce1(filePtr);                            // creates a Reduce object 
-    reduce1.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
+
+    fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
+    Reduce reduce1(filePtr);                   // creates a Reduce object
                                                         // the string is a word from Shakespeare and vector<int> = [1,1,1,..] where vector<int>.size() is the number of occurences of "string"
-    reduce1.reduceFile();                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int> 
+    reduce1.reduceFile(fileIO.getHoldingMap());                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int>
     reduce1.writeReduce();                              // writes the maped and reduced data to file.
 
     return(0);  

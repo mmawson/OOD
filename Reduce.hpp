@@ -28,14 +28,14 @@ class Reduce {
 public:
 
     Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr);
-    void sortMap();
-    void reduceFile();
+//    void sortMap();
+    void reduceFile(std::map<std::string, std::vector<int>>);
     void writeReduce();
 
 private:
     std::shared_ptr<MapReduce::FileIOManager> rFileIOMgr;
     std::map <std::string, int> reduceTemp;
-    std::map<std::string, std::vector<int>> holdingMap;
+//    std::map<std::string, std::vector<int>> holdingMap;
 
 
 
