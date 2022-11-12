@@ -52,6 +52,7 @@ Art by Shanaka Dias
 #include "FileIO.hpp"
 #include "Map.hpp"
 #include "Reduce.hpp"
+#include "DynamicLoader.h"
 
 // end libarary
 
@@ -59,28 +60,32 @@ using namespace MapReduce;  // This will keep collisions between other peoples c
 using namespace std;
 
 int main(int argc, char *argv[]) {  // main is called with arguments from the command line
-    std::filesystem::path dir1, dir2, dir3;  // These variables are path objects from the filesystem library.  They are 1: input directory, 2: temp directory, 3: output directory
+    std::filesystem::path dir1, dir2, dir3, dir4;  // These variables are path objects from the filesystem library.  They are 1: input directory, 2: temp directory, 3: output directory
 
     switch(argc) {  // argc is the number of arguments passed to the command line.  
     case 1 :  // agrc = 1 indicates no arguments were passed
         dir1 = filesystem::path("./text");  // all our directories are initialized with default settings
         dir2 = filesystem::path("./temp");
         dir3 = filesystem::path("./output");
+        dir4 = filesystem::path("./lib");
         break;
     case 2 :  // agc = 2 indicates that the input directory has been passed as an argument
         dir1 = filesystem::path(argv[1]);
         dir2 = filesystem::path("./temp");  // the other directories are default values
         dir3 = filesystem::path("./output");
+        dir4 = filesystem::path("./lib");
         break;
     case 3 :  // agc = 2 indicates that the input directory and temp directory have been passed as an argument
         dir1 = filesystem::path(argv[1]);
         dir2 = filesystem::path(argv[2]);
         dir3 = filesystem::path("./output");  // the output directory is given a default value
+        dir4 = filesystem::path("./lib");
         break;
     default :  // agrc >=3 means all directories are initialized with values passed by the command line
         dir1 = filesystem::path(argv[1]);
         dir2 = filesystem::path(argv[2]);
         dir3 = filesystem::path(argv[3]);
+        dir4 = filesystem::path(argv[4]);
         break;
     }
     /* At this point all the directories a initialized */
@@ -108,6 +113,12 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
                                                         // the string is a word from Shakespeare and vector<int> = [1,1,1,..] where vector<int>.size() is the number of occurences of "string"
     reduce1.reduceFile(fileIO.getHoldingMap());                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int>
     reduce1.writeReduce();                              // writes the maped and reduced data to file.
+
+    DynamicLoader loader1(dir4);
+    loader1.populateLibs(); //add lib files to loader vector
+    loader1.assignFuncVec("mapToOutputFile", fileIO.getTempFileLines()); // use loader to lookup and call function
+
+
 
     return(0);  
 }
