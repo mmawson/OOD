@@ -12,6 +12,7 @@
 
 #include "Map.hpp"
 #include "FileIO.hpp"
+#include "Functions.h"
 #include <cctype>
 #include <vector>
 #include <iostream>
@@ -67,4 +68,24 @@ std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
   return tokenizedLine;
 }
 
+extern "C" Functions* Map::createMap() {
+        return new Map;
+    }
+
+extern "C" void Map::destroyMap(Functions* p) {
+        delete p;
+    }
+
+    Map::Map() {
+
+    }
+
+
+    void Map::reduceFile(std::map<std::string, std::vector<int>>) {
+
+    }
+
+    void Map::writeReduce() {
+
+    }
 } //namespace MapReduce

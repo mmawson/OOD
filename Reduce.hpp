@@ -18,24 +18,30 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include "Functions.h"
+
 namespace MapReduce {
 
 //forward declaration
 class FileIOManager;
 
-class Reduce {
+class Reduce : public Functions{
 
 public:
 
+    Reduce();
     Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr);
-//    void sortMap();
     void reduceFile(std::map<std::string, std::vector<int>>);
     void writeReduce();
+    void mapToOutputFile(const std::vector<std::string>&) {};
+    std::vector<std::string> tokenizeLine(const std::string&);
+
+    Functions* createReduce();
+    void destroyReduce(Functions*);
 
 private:
     std::shared_ptr<MapReduce::FileIOManager> rFileIOMgr;
     std::map <std::string, int> reduceTemp;
-//    std::map<std::string, std::vector<int>> holdingMap;
 
 
 

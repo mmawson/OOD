@@ -12,6 +12,8 @@
 
 #include "Reduce.hpp"
 #include "FileIO.hpp"
+#include "Functions.h"
+
 #include <fstream>
 #include <ostream>
 #include <iostream>
@@ -22,28 +24,10 @@
 
 namespace MapReduce {
 
-Reduce::Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr) : rFileIOMgr(fileIOMgr) {}
+Reduce::Reduce() {
+    }
 
-//void Reduce::sortMap() {
-//    std::ifstream in(rFileIOMgr->getTempDir().string()+"/shakesTemp.txt");      // create input stream
-//    int value;
-//    std::string key;
-//    if (!in.is_open())
-//        return;
-//    while (std::getline(in, key,',') && in >> value){
-//        //Sanitize the key, removing parens
-//        std::string newKey = "";
-//        for (size_t i = 0; i < key.size(); ++i)
-//        {
-//            if (key[i] != '(' && key[i] != ')')
-//            {
-//                newKey += key[i];
-//            }
-//        }
-//        holdingMap[newKey].push_back(value);
-//    }
-//    in.close();  // close input stream
-//}
+Reduce::Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr) : rFileIOMgr(fileIOMgr) {}
 
 
 void Reduce::reduceFile(std::map<std::string, std::vector<int>> newHoldingMap) {
@@ -67,4 +51,18 @@ void Reduce::writeReduce(){
     }
     rFileIOMgr->save(finalReduce, "result.txt", rFileIOMgr->getOutputDir());
     }
+
+extern "C" Functions *Reduce::createReduce() { // create function to instantiate object for dlopen()
+        return new Reduce();
+    }
+
+extern "C" void Reduce::destroyReduce(Functions* p) { //explicit destrcutor for use via dlopen()
+        delete p;
+    }
+
+    std::vector<std::string> Reduce::tokenizeLine(const string &) {
+        return std::vector<std::string>();
+    }
+
+
 }

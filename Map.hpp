@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "Functions.h"
 
 namespace MapReduce
 {
@@ -23,11 +24,19 @@ namespace MapReduce
 //Forward declaration
 class FileIOManager;
 
-class Map {
+    class Map : public Functions{
 public:
+  Map();
   Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile);
-
   void mapToOutputFile(const std::vector<std::string>& inputLines);
+
+
+  void reduceFile(std::map<std::string, std::vector<int>>);
+  void writeReduce();
+
+ Functions* createMap();
+
+  void destroyMap(Functions*);
 
 private:
   std::vector<std::string> tokenizeLine(const std::string& lineStr);
