@@ -26,17 +26,13 @@ class FileIOManager;
 
     class Map : public Functions{
 public:
-  Map();
+//  Map();
   Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile);
-  void mapToOutputFile(const std::vector<std::string>& inputLines);
-
+//  void mapToOutputFile(const std::vector<std::string>& inputLines);
+  std::vector<std::string> mapToOutputFile(const std::vector<std::string> &);
 
   void reduceFile(std::map<std::string, std::vector<int>>);
-  void writeReduce();
-
- Functions* createMap();
-
-  void destroyMap(Functions*);
+  std::vector<std::string> writeReduce();
 
 private:
   std::vector<std::string> tokenizeLine(const std::string& lineStr);

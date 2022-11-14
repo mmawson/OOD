@@ -55,14 +55,13 @@ Art by Shanaka Dias
 #include "DynamicLoader.h"
 #include <dlfcn.h>
 #include "Functions.h"
+#include <map>
 
 // end libarary
 
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
 
-typedef Functions* create_t();
-typedef void destroy_t(Functions *);
 
 int main(int argc, char *argv[]) {  // main is called with arguments from the command line
     std::filesystem::path dir1, dir2, dir3, dir4;  // These variables are path objects from the filesystem library.  They are 1: input directory, 2: temp directory, 3: output directory
@@ -106,33 +105,27 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
     auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
 
-    /* Here starts the block of code trying to call the .so files as classes
-     * Assign the createMap function function to a pointer and then call to instantiate an object of Map type
-     * Once instantiated can call member methods via the pointer
-     * Need a create and destructor method to ensure resources are released
-     * here is a good reference https://tldp.org/HOWTO/pdf/C++-dlopen.pdf
-     * */
-
+    //    open .so file and assign to void pointer, RTLD_LAZY binds functions as called
     void* mapPtr = dlopen("./libmapNew.so", RTLD_LAZY);
     if(!mapPtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
         return 1;
     }
     dlerror();
-    create_t* FuncMap = (create_t*) dlsym(mapPtr, "createMap");
+//    maker_t defined in Functions class, declare as a pointer and typecast output of dlsym
+//    maker function creates new instance of map
+    maker_t *FuncMap = (maker_t *) dlsym(mapPtr, "maker");
     const char* dlsym_error = dlerror();
     if (dlsym_error) {
         cerr << "Cannot load symbol create: " << dlsym_error << '\n';
         return 1;
     }
-    destroy_t* destroy_map = (destroy_t*) dlsym(mapPtr, "destroyMap");
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-        cerr << "Cannot load symbol destroy: " << dlsym_error << '\n';
-        return 1;
-    }
-    Functions* map1 = FuncMap();
-    map1->mapToOutputFile(fileIO.getTempFileLines());
+//  pointer to type Functions to allow access to all derived functions
+    Functions* map1 = FuncMap(filePtr, mapOutputFile);
+    vector<string> mapOutput;
+    mapOutput = map1->mapToOutputFile(fileIO.getTempFileLines());
+    fileIO.save(mapOutput,mapOutputFile,fileIO.getTempDir());
+//    fileIO.save(map1->getTokenizedData(),map1->mOutputFile,fileIO.getTempDir());
 
 
 //    Map map1(filePtr, mapOutputFile);             // create a map object with a handel to the FileIOManager
@@ -144,26 +137,29 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
 // Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
 
     fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
-    void* reducePtr = dlopen("./libReduceNew.so", RTLD_LAZY);
+
+
+    void* reducePtr = dlopen("./libreduceNew.so", RTLD_LAZY);
     if(!reducePtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
         return 1;
     }
     dlerror();
-    create_t* FuncReduce = (create_t*) dlsym(reducePtr, "createReduce");
-    if (dlsym_error) {
+    maker_tRed *FuncReduce = (maker_tRed*) dlsym(reducePtr, "makerRed");
+    const char* dlsym_error1 = dlerror();
+    if (dlsym_error1) {
         cerr << "Cannot load symbol create: " << dlsym_error << '\n';
         return 1;
     }
-    destroy_t* destroy_reduce = (destroy_t*) dlsym(reducePtr, "destroyReduce");
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-        cerr << "Cannot load symbol destroy: " << dlsym_error << '\n';
-        return 1;
-    }
-    Functions* reduce1 = FuncReduce();
+    Functions* reduce1 = FuncReduce(filePtr);
+    vector<string> reduceOutput;
     reduce1->reduceFile(fileIO.getHoldingMap());
-    reduce1->writeReduce();
+    reduceOutput = reduce1->writeReduce();
+    fileIO.save(reduceOutput,"result.txt", fileIO.getOutputDir());
+
+//    Functions* reduce1 = FuncReduce();
+//    reduce1->reduceFile(fileIO.getHoldingMap());
+//    reduce1->writeReduce();
 
 
 

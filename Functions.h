@@ -17,13 +17,14 @@ namespace MapReduce {
     class Functions {
 
     public:
-        Functions();
+//        Functions();
 
         virtual void reduceFile(std::map<std::string, std::vector<int>>) = 0;
 
-        virtual void writeReduce() = 0;
+        virtual std::vector<std::string> writeReduce() = 0;
 
-        virtual void mapToOutputFile(const std::vector<std::string> &) = 0;
+//        virtual void mapToOutputFile(const std::vector<std::string> &) = 0;
+        virtual std::vector<std::string> mapToOutputFile(const std::vector<std::string> &) = 0;
 
         std::shared_ptr<MapReduce::FileIOManager> rFileIOMgr;
         std::shared_ptr<FileIOManager> mFileIOMgr;
@@ -32,27 +33,16 @@ namespace MapReduce {
 
         virtual std::vector<std::string> tokenizeLine(const std::string &) = 0;
 
-//        virtual Functions* createMap() {
-//            return nullptr;
-//        }
 
-        virtual Functions* createReduce() {
-            return nullptr;
-        }
-
-        void destroyMap(Functions*){};
-        void destroyReduce(Functions*){};
-
-
-        //class factories
-        typedef Functions *create_t();
-
-        typedef void destroy_t(Functions *);
-
-
-    private:
 
     };
+        //class factories
+    typedef Functions *maker_t(std::shared_ptr<FileIOManager>, const std::string&);
+    typedef Functions *maker_tRed(std::shared_ptr<FileIOManager>);
+
+
+
+
 
 }
 #endif //OOD1_FUNCTIONS_H

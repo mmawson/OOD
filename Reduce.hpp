@@ -32,12 +32,11 @@ public:
     Reduce();
     Reduce(std::shared_ptr<MapReduce::FileIOManager> fileIOMgr);
     void reduceFile(std::map<std::string, std::vector<int>>);
-    void writeReduce();
-    void mapToOutputFile(const std::vector<std::string>&) {};
+    std::vector<std::string> writeReduce();
+    std::vector<std::string> mapToOutputFile(const std::vector<std::string> &);
     std::vector<std::string> tokenizeLine(const std::string&);
 
-    Functions* createReduce();
-    void destroyReduce(Functions*);
+
 
 private:
     std::shared_ptr<MapReduce::FileIOManager> rFileIOMgr;

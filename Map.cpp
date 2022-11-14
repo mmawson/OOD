@@ -16,16 +16,19 @@
 #include <cctype>
 #include <vector>
 #include <iostream>
+#include <string>
+#include <map>
 
 namespace MapReduce
 {
 
-Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) : mFileIOMgr(fileIOMgr), mOutputFile(outputFile)
+Map::Map(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) :mFileIOMgr(fileIOMgr), mOutputFile(outputFile)
 {
   
 }
 
-void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
+//void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
+    std::vector<std::string> Map::mapToOutputFile(const vector<std::string> & inputLines)
 {
   std::vector<std::string> tokenizedData;
 
@@ -36,8 +39,8 @@ void Map::mapToOutputFile(const std::vector<std::string>& inputLines)
       tokenizedData.push_back(token);
     }
   }
-
-  mFileIOMgr->save(tokenizedData, mOutputFile, mFileIOMgr->getTempDir());
+  return tokenizedData;
+//  mFileIOMgr->save(tokenizedData, mOutputFile, mFileIOMgr->getTempDir());
 }
 
 std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
@@ -68,24 +71,21 @@ std::vector<std::string> Map::tokenizeLine(const std::string& lineStr)
   return tokenizedLine;
 }
 
-extern "C" Functions* Map::createMap() {
-        return new Map;
-    }
-
-extern "C" void Map::destroyMap(Functions* p) {
-        delete p;
-    }
-
-    Map::Map() {
-
-    }
-
 
     void Map::reduceFile(std::map<std::string, std::vector<int>>) {
 
     }
 
-    void Map::writeReduce() {
-
+    std::vector<std::string> Map::writeReduce() {
+        return std::vector<std::string>();
     }
+
+
+
+    extern "C" {
+    Functions *maker(std::shared_ptr<FileIOManager> fileIOMgr, const std::string& outputFile) {
+        return new Map(fileIOMgr,outputFile);
+    }
+    }
+
 } //namespace MapReduce
