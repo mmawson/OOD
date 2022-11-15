@@ -73,8 +73,8 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     dir2 = filesystem::path("./temp");
     dir3 = filesystem::path("./output");
     dir4 = filesystem::path("./lib");
-    pathToMapLib = "./libmapNew.so";
-    pathToReduceLib = "./libreduceNew.so";
+    pathToMapLib = "./lib/libmapNew.so";
+    pathToReduceLib = "./lib/libreduceNew.so";
 
     if (argc >= 2)
     {
