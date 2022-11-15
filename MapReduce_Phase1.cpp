@@ -56,6 +56,7 @@ Art by Shanaka Dias
 #include <dlfcn.h>
 #include "Functions.h"
 #include <map>
+#include <string>
 
 // end libarary
 
@@ -65,32 +66,39 @@ using namespace std;
 
 int main(int argc, char *argv[]) {  // main is called with arguments from the command line
     std::filesystem::path dir1, dir2, dir3, dir4;  // These variables are path objects from the filesystem library.  They are 1: input directory, 2: temp directory, 3: output directory
+    std::string pathToMapLib, pathToReduceLib;
 
-    switch(argc) {  // argc is the number of arguments passed to the command line.  
-    case 1 :  // agrc = 1 indicates no arguments were passed
-        dir1 = filesystem::path("./text");  // all our directories are initialized with default settings
-        dir2 = filesystem::path("./temp");
-        dir3 = filesystem::path("./output");
-        dir4 = filesystem::path("./lib");
-        break;
-    case 2 :  // agc = 2 indicates that the input directory has been passed as an argument
+    //Default values
+    dir1 = filesystem::path("./text");  // all our directories are initialized with default settings
+    dir2 = filesystem::path("./temp");
+    dir3 = filesystem::path("./output");
+    dir4 = filesystem::path("./lib");
+    pathToMapLib = "./libmapNew.so";
+    pathToReduceLib = "./libreduceNew.so";
+
+    if (argc >= 2)
+    {
         dir1 = filesystem::path(argv[1]);
-        dir2 = filesystem::path("./temp");  // the other directories are default values
-        dir3 = filesystem::path("./output");
-        dir4 = filesystem::path("./lib");
-        break;
-    case 3 :  // agc = 2 indicates that the input directory and temp directory have been passed as an argument
-        dir1 = filesystem::path(argv[1]);
+    }
+    if (argc >= 3)
+    {
         dir2 = filesystem::path(argv[2]);
-        dir3 = filesystem::path("./output");  // the output directory is given a default value
-        dir4 = filesystem::path("./lib");
-        break;
-    default :  // agrc >=3 means all directories are initialized with values passed by the command line
-        dir1 = filesystem::path(argv[1]);
-        dir2 = filesystem::path(argv[2]);
+    }
+    if (argc >= 4)
+    {
         dir3 = filesystem::path(argv[3]);
+    }
+    if (argc >= 5)
+    {
         dir4 = filesystem::path(argv[4]);
-        break;
+    }
+    if (argc >= 6)
+    {
+        pathToMapLib = std::string(argv[5]);
+    }
+    if (argc >= 7)
+    {
+        pathToReduceLib = std::string(argv[6]);
     }
     /* At this point all the directories a initialized */
 
@@ -106,7 +114,7 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
 
     //    open .so file and assign to void pointer, RTLD_LAZY binds functions as called
-    void* mapPtr = dlopen("./libmapNew.so", RTLD_LAZY);
+    void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
     if(!mapPtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
         return 1;
@@ -139,7 +147,7 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
 
 
-    void* reducePtr = dlopen("./libreduceNew.so", RTLD_LAZY);
+    void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
     if(!reducePtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
         return 1;
