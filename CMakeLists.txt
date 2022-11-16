@@ -15,8 +15,9 @@ add_executable(OOD1
         MapReduce_Phase1.cpp
 #        Reduce.cpp
         Reduce.hpp
-        DynamicLoader.cpp
-        DynamicLoader.h Functions.cpp Functions.h)
+#        DynamicLoader.cpp
+#        DynamicLoader.h
+        Functions.cpp Functions.h)
 
 target_link_libraries(OOD1 ${CMAKE_DL_LIBS})
 
