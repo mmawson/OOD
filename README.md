@@ -59,6 +59,7 @@ sequenceDiagram
     FileIO->>+Map: Pass file name and lines 
     Map->>Map: tokenize data 
     Map->>Map: Export function to write to disk
+    FileIO->>FileIO: Sort Map output
     FileIO->>+Reduce: Open temp file and pass data
     Reduce->>Reduce: Iterate over values and sum 
     Reduce->>Reduce: Export to write to disk
