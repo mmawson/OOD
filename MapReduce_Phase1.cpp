@@ -133,19 +133,7 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     vector<string> mapOutput;
     mapOutput = map1->mapToOutputFile(fileIO.getTempFileLines());
     fileIO.save(mapOutput,mapOutputFile,fileIO.getTempDir());
-//    fileIO.save(map1->getTokenizedData(),map1->mOutputFile,fileIO.getTempDir());
-
-
-//    Map map1(filePtr, mapOutputFile);             // create a map object with a handel to the FileIOManager
-//    map1.mapToOutputFile(fileIO.getTempFileLines());    // pass the private tempFileLines vector to the Map, map1
-//                                                        // This will tokenize tempFileLines in the format ("token1",1),("token2",1), etc.
-//                                                        // mapToOutputFile then calls FileIOManager->saveTemp(tokenizedData)
-//                                                        // which creates ./temp/shakesTemp.txt (or whatever temp directory you passed).
-
-// Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
-
     fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
-
 
     void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
     if(!reducePtr){
@@ -164,17 +152,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     reduce1->reduceFile(fileIO.getHoldingMap());
     reduceOutput = reduce1->writeReduce();
     fileIO.save(reduceOutput,"result.txt", fileIO.getOutputDir());
-
-//    Functions* reduce1 = FuncReduce();
-//    reduce1->reduceFile(fileIO.getHoldingMap());
-//    reduce1->writeReduce();
-
-
-
-//    Reduce reduce1(filePtr);                   // creates a Reduce object
-//                                                        // the string is a word from Shakespeare and vector<int> = [1,1,1,..] where vector<int>.size() is the number of occurences of "string"
-//    reduce1.reduceFile(fileIO.getHoldingMap());                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int>
-//    reduce1.writeReduce();                              // writes the maped and reduced data to file.
 
 
 
