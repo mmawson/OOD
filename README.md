@@ -1,6 +1,6 @@
 # CSE 687 Object Oriented Design Project
 ## MapReduce
-## Phase #1
+## Phase #2
 
 This file can evolve as classes and workflow are added
 
