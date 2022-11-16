@@ -49,6 +49,7 @@ Art by Shanaka Dias
 #include <iostream>
 #include <stdio.h>
 #include <filesystem>
+#include <thread>
 #include "FileIO.hpp"
 #include "Map.hpp"
 #include "Reduce.hpp"
@@ -60,11 +61,13 @@ Art by Shanaka Dias
 
 // end libarary
 
+#define R 2 // R is the number buckets, Map threads, and reducer processes
+
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
 
-
 int main(int argc, char *argv[]) {  // main is called with arguments from the command line
+
     std::filesystem::path dir1, dir2, dir3, dir4;  // These variables are path objects from the filesystem library.  They are 1: input directory, 2: temp directory, 3: output directory
     std::string pathToMapLib, pathToReduceLib;
 
@@ -102,18 +105,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     }
     /* At this point all the directories a initialized */
 
-    // The FileIOManager class handles FileIO
-    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
-    fileIO.toString();  // Print the name of the directories (input, temp, and output)
-    fileIO.populateFiles();  // This iteratively opens all the files in the input directory and 
-                             // saves the contents in a private string vector (tempFileLines) using a call to FileIOManager::read()
-                             // Now all the plays, poems, and sonnets are in one large string vector 
-
-    const std::string mapOutputFile = "shakesTemp.txt";
-    // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
-    auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
-
-    //    open .so file and assign to void pointer, RTLD_LAZY binds functions as called
     void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
     if(!mapPtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
@@ -128,24 +119,44 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         cerr << "Cannot load symbol create: " << dlsym_error << '\n';
         return 1;
     }
-//  pointer to type Functions to allow access to all derived functions
-    Functions* map1 = FuncMap(filePtr, mapOutputFile);
-    vector<string> mapOutput;
-    mapOutput = map1->mapToOutputFile(fileIO.getTempFileLines());
-    fileIO.save(mapOutput,mapOutputFile,fileIO.getTempDir());
-//    fileIO.save(map1->getTokenizedData(),map1->mOutputFile,fileIO.getTempDir());
 
+    // Lambda expression for a map thread
+    auto mapFunctionThread = [&] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
+        Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
+        vector<string> mapOutput;
+        mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
+        fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
+    };
 
-//    Map map1(filePtr, mapOutputFile);             // create a map object with a handel to the FileIOManager
-//    map1.mapToOutputFile(fileIO.getTempFileLines());    // pass the private tempFileLines vector to the Map, map1
-//                                                        // This will tokenize tempFileLines in the format ("token1",1),("token2",1), etc.
-//                                                        // mapToOutputFile then calls FileIOManager->saveTemp(tokenizedData)
-//                                                        // which creates ./temp/shakesTemp.txt (or whatever temp directory you passed).
+//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
+ 
+ /*** This block should be should be saved in a seperate file titled "partition" */
+
+    // a loop to read input text in batches of size NumFiles/R
+    for (int a = 1; a <= R; a++) {
+        // The FileIOManager class handles FileIO
+        MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
+        fileIO.populateFiles(a, R);  // This iteratively opens all the files in batch "a" in the input directory and 
+                             // saves the contents in a private string vector (tempFileLines) using a call to FileIOManager::read()
+                             // Now all the plays, poems, and sonnets are in one large string vector 
+        std::string mapOutputFile = "shakesTemp.txt" + to_string(a);
+    // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
+        auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
+    // Create a thread and pass it the  
+    std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
+    mapThread.join();
+    }
+
+/* end partition block */
+
+/**** Map completes
+***** The following code needs to be reworked to accomadate threading
 
 // Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
-
+    }
     fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
-
+    
+// open .so file and assign to void pointer, RTLD_LAZY binds functions as called
 
     void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
     if(!reducePtr){
@@ -177,8 +188,8 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
 //    reduce1.writeReduce();                              // writes the maped and reduced data to file.
 
 
+ 
 
-
-
+*/
     return(0);  
 }

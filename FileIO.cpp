@@ -55,6 +55,16 @@ FileIOManager::FileIOManager(filesystem::path sourceDirArg, std::filesystem::pat
     }
 }
 
+//  Block counts files in in dir
+// int reducerNumber = fileCount(dir1)/R;
+
+int FileIOManager::fileCountFunct(std::filesystem::path dir) {
+    int f_count = 0;
+    for (auto& p : std::filesystem::directory_iterator(dir)) {
+        f_count++;
+        }
+        return f_count;
+}
 
 // Every class should have a toString()
 int FileIOManager::toString() {
@@ -80,15 +90,24 @@ bool FileIOManager::check(std::filesystem::path aPath) {
 }
 
 // Iterates over directory to populate vector with files housed within source directory
-void FileIOManager::populateFiles() {
-   // directory_iterator can be iterated using a range-for loop
-   for (auto const& dir_entry : std::filesystem::directory_iterator{sourceDir})
-   {
-       inputFiles.push_back(dir_entry.path()); //push filename onto vector
-   }
-   for (int n = 0; n < inputFiles.size(); n++) {    // iterate through all files in sourceDir 
-    read(inputFiles.at(n));
-   }
+void FileIOManager::populateFiles(int bucketNumber, int bucketSize) {
+    std::vector<std::filesystem::path> inputFiles;  // this is a vector list of all files in sourceDir
+    // file_Count counts the number of files in sourcDir so that they can be paritioned
+    int file_Count = fileCountFunct(sourceDir);
+    // fileCount variable stores the number of the current file for batch calculation
+    int fileCount = 1;
+    // directory_iterator can be iterated using a range-for loop        
+    for (auto& dir_entry : std::filesystem::directory_iterator{sourceDir}) {
+        // This if statement puts files from the current batch into a vector 
+        if( fileCount >= (bucketNumber-1)*file_Count/bucketSize && fileCount < (bucketNumber)*file_Count/bucketSize || (bucketNumber == bucketSize && fileCount == file_Count))  {
+            inputFiles.push_back(dir_entry.path()); //push filename onto vector
+//          cout << "File # " << fileCount << " contains" << dir_entry.path() << "\n";
+        }
+        fileCount++;
+    }
+    for (int n = 0; n < inputFiles.size(); n++) {    // iterate through all files in sourceDir 
+        read(inputFiles.at(n));
+    }
 }
 
 // This method reads a file passed as an argument
