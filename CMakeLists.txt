@@ -10,14 +10,9 @@ include_directories(.)
 add_executable(OOD1
         FileIO.cpp
         FileIO.hpp
-#        Map.cpp
-        Map.hpp
         MapReduce_Phase1.cpp
-#        Reduce.cpp
-        Reduce.hpp
-#        DynamicLoader.cpp
-#        DynamicLoader.h
-        Functions.cpp Functions.h)
+        Functions.cpp
+        Functions.h)
 
 target_link_libraries(OOD1 ${CMAKE_DL_LIBS})
 
