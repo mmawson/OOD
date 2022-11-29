@@ -61,7 +61,7 @@ Art by Shanaka Dias
 
 // end libarary
 
-#define R 2 // R is the number buckets, Map threads, and reducer processes
+#define R 5 // R is the number buckets, Map threads, and reducer processes
 
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
         fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
     };
-
+//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
 //    fileIO.toString();  // Print the name of the directories (input, temp, and output)
  
  /*** This block should be should be saved in a seperate file titled "partition" */
@@ -146,40 +146,53 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
     mapThread.join();
     }
-
 /* end partition block */
 
-/**** Map completes
-***** The following code needs to be reworked to accomadate threading
+/**** Map completes  **/
+
+//  Lambda for Reduce
+    auto reduceFunctionThread = [&] (auto fileIoPtr, string reduceInputFile, int b) { //  pointer to type Functions to allow access to all derived functions
+        fileIoPtr->sortMap(reduceInputFile);
+        auto holdingMap = fileIoPtr->getHoldingMap();
+
+        // open .so file and assign to void pointer, RTLD_LAZY binds functions as called
+
+        void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
+        if(!reducePtr){
+            cerr <<"Cannot load library: "<< dlerror() <<'\n';
+            return 1;
+        }
+        dlerror();
+        maker_tRed *FuncReduce = (maker_tRed*) dlsym(reducePtr, "makerRed");
+        const char* dlsym_error1 = dlerror();
+        if (dlsym_error1) {
+            cerr << "Cannot load symbol create: " << dlsym_error << '\n';
+            return 1;
+        }
+        Functions* reduce1 = FuncReduce(fileIoPtr);
+        vector<string> reduceOutput;
+        reduce1->reduceFile(holdingMap);
+        reduceOutput = reduce1->writeReduce();
+        // If b == R we are processing our last temp file and saving SUCCESS.txt
+        if (b == R) {
+            fileIoPtr->save(reduceOutput,"SUCCESS.txt", fileIoPtr->getOutputDir());
+        }
+        // If b!=R we are saving bucket r to file
+        else {
+            fileIoPtr->save(reduceOutput,"reducedPiece" + to_string(b) + ".txt", fileIoPtr->getOutputDir());
+        }
+        return 0;
+    };
 
 // Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
+    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
+    auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
+    for (int b = 1; b <= R; b++) {
+        // The FileIOManager class handles FileIO
+        std::string reduceInputFile = "shakesTemp.txt" + to_string(b);
+        std::thread reduceThread(reduceFunctionThread, filePtr, reduceInputFile, b);
+        reduceThread.join();
     }
-    fileIO.sortMap();                                  // reads in shakesTemp and creates a holding map which is a std::map<std::string, std::vector<int>>
-    
-// open .so file and assign to void pointer, RTLD_LAZY binds functions as called
-
-    void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
-    if(!reducePtr){
-        cerr <<"Cannot load library: "<< dlerror() <<'\n';
-        return 1;
-    }
-    dlerror();
-    maker_tRed *FuncReduce = (maker_tRed*) dlsym(reducePtr, "makerRed");
-    const char* dlsym_error1 = dlerror();
-    if (dlsym_error1) {
-        cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-        return 1;
-    }
-    Functions* reduce1 = FuncReduce(filePtr);
-    vector<string> reduceOutput;
-    reduce1->reduceFile(fileIO.getHoldingMap());
-    reduceOutput = reduce1->writeReduce();
-    fileIO.save(reduceOutput,"result.txt", fileIO.getOutputDir());
-
-//    Functions* reduce1 = FuncReduce();
-//    reduce1->reduceFile(fileIO.getHoldingMap());
-//    reduce1->writeReduce();
-
 
 
 //    Reduce reduce1(filePtr);                   // creates a Reduce object
@@ -187,9 +200,5 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
 //    reduce1.reduceFile(fileIO.getHoldingMap());                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int>
 //    reduce1.writeReduce();                              // writes the maped and reduced data to file.
 
-
- 
-
-*/
     return(0);  
 }

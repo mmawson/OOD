@@ -28,8 +28,9 @@ using namespace MapReduce;  // This prevents our member functions from colliding
 // A default constructor just in case
     FileIOManager::FileIOManager() {
     sourceDir = filesystem::path("./text");
-    tempDir = filesystem::path("./temp");
+    tempDir = filesystem::path("./temp/");
     outputDir = filesystem::path("./output");
+    holdingMap = {};
 }
 
 // The constructor we will use
@@ -53,6 +54,7 @@ FileIOManager::FileIOManager(filesystem::path sourceDirArg, std::filesystem::pat
         cout << "Output directory argument error\nUsing default value\n";
         sourceDir = filesystem::path("./output");
     }
+    holdingMap = {};
 }
 
 //  Block counts files in in dir
@@ -69,7 +71,7 @@ int FileIOManager::fileCountFunct(std::filesystem::path dir) {
 // Every class should have a toString()
 int FileIOManager::toString() {
         string outputStr = "\nSource directory: " + sourceDir.u8string() + "\nTemp directory: " + tempDir.u8string() + "\nOutput directory: " + outputDir.u8string() + "\n";
-        cout << outputStr;  
+        cout << outputStr;
         return 0;
     }
 
@@ -142,8 +144,8 @@ void FileIOManager::save(std::vector<std::string> & tokenizedTempVector, string 
 }
 
 
-void FileIOManager::sortMap() {
-    std::ifstream in(getTempDir().string()+"/shakesTemp.txt");      // create input stream
+void FileIOManager::sortMap(string shakesString) {
+    std::ifstream in(getTempDir().string()+ "/" + shakesString);      // create input stream
     int value;
     std::string key;
     if (!in.is_open())

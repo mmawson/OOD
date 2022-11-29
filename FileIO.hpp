@@ -50,7 +50,7 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         std::filesystem::path getTempDir();    // {return tempDir; }
         std::filesystem::path getOutputDir();  // { return outputDir; }
         std::map<std::string, std::vector<int>> getHoldingMap();
-        void sortMap();
+        void sortMap(std::string);
 
         // every class should have a toString
         int toString();         // Prints the values of the constructor arguments
