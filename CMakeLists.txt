@@ -10,7 +10,7 @@ include_directories(.)
 add_executable(OOD1
         FileIO.cpp
         FileIO.hpp
-        MapReduce_Phase1.cpp
+        MapReduce_Phase3.cpp
         Functions.cpp
         Functions.h)
 

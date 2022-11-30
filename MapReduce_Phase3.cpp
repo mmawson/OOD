@@ -199,7 +199,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
 //                                                        // the string is a word from Shakespeare and vector<int> = [1,1,1,..] where vector<int>.size() is the number of occurences of "string"
 //    reduce1.reduceFile(fileIO.getHoldingMap());                               // This method sums the holding map's, vector<int>, to get a word count                                // Then adds the count along with the word string to a map <string,int>
 //    reduce1.writeReduce();                              // writes the maped and reduced data to file.
->>>>>>> origin/Map-Reduce-Phase-3:MapReduce_Phase3.cpp
 
     return(0);  
 }
