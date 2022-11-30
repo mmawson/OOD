@@ -16,6 +16,8 @@ add_executable(OOD1
 
 target_link_libraries(OOD1 ${CMAKE_DL_LIBS})
 
+SET(CMAKE_CXX_FLAGS -pthread)
+
 # CMAKE to generate reduce.so ===================================================================================
 # Specify the minimum version.
 cmake_minimum_required(VERSION 3.23)
