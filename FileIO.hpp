@@ -41,7 +41,7 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         std::vector<std::string> getTempFileLines();
 
         // populates files
-        void populateFiles();
+        void populateFiles(int, int);
 
         // Save tokenized text to file
         void save(std::vector<std::string> & tokenizedTempVector, string, std::filesystem::path);
@@ -50,19 +50,20 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         std::filesystem::path getTempDir();    // {return tempDir; }
         std::filesystem::path getOutputDir();  // { return outputDir; }
         std::map<std::string, std::vector<int>> getHoldingMap();
-        void sortMap();
+        void sortMap(std::string);
 
         // every class should have a toString
         int toString();         // Prints the values of the constructor arguments
 
     private:
+        int fileCountFunct(std::filesystem::path);
         bool check(std::filesystem::path);   // This is checker function to ensure directories passed by user are validfunction checks 
         // member data
         std::filesystem::path sourceDir;    // The Source Directory
         std::filesystem::path tempDir;      // The Temporary Directory
         std::filesystem::path outputDir;    // The Output Directory
         std::map<std::string, std::vector<int>> holdingMap; // sorted map of all keys from Map class
-        std::vector<std::filesystem::path> inputFiles;  // this is a vector list of all files in sourceDir
+//        std::vector<std::filesystem::path> inputFiles;  // this is a vector list of all files in sourceDir
         std::vector<std::string> tempFileLines;     // This is the tokenized temp file vector
                                                     // it holds all the words of the text in Shakespeare
                                                     // std::map<std::string, std::vector<int>> holdingMap;
