@@ -48,23 +48,121 @@ Art by Shanaka Dias
 // include some library files
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <cstdio>
 #include <filesystem>
 #include <thread>
+#include <map>
+#include <string>
+#include <string.h>
+
+/* Socket Programming Libaries */
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netinet/in.h>
+/* End Socket Programing Libraries */
+
+/* local libraries */
 #include "FileIO.hpp"
 #include "Map.hpp"
 #include "Reduce.hpp"
 #include "DynamicLoader.h"
-#include <dlfcn.h>
 #include "Functions.h"
-#include <map>
-#include <string>
+/* end local libraries */
+
+
+
+/* library for using libraries*/
+#include <dlfcn.h>
+
 
 // end libarary
 
 #define R 5 // R is the number buckets, Map threads, and reducer processes
-
+#define PORT 8080
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
+
+int controllerFunct() {
+    int obj_server, sock, reader;
+    struct sockaddr_in address;
+    int opted = 1;
+    int address_length = sizeof(address);
+    char buffer[1024] = {0};
+    if (( obj_server = socket ( AF_INET, SOCK_STREAM, 0)) == 0)
+        {
+            perror ( "Opening of Socket Failed !");
+            exit ( EXIT_FAILURE);
+        }
+    if ( setsockopt(obj_server, SOL_SOCKET, SO_REUSEADDR,
+        &opted, sizeof ( opted )))
+    {
+        perror ( "Can't set the socket" );
+        exit ( EXIT_FAILURE );
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+    if (bind(obj_server, ( struct sockaddr * )&address,
+        sizeof(address))<0)
+    {
+        perror ( "Binding of socket failed !" );
+        exit(EXIT_FAILURE);
+    }
+    if (listen ( obj_server, 3) < 0)
+    {
+        perror ( "Can't listen from the server !");
+        exit(EXIT_FAILURE);
+    }
+    if ((sock = accept(obj_server, (struct sockaddr *)&address, (socklen_t*)&address_length)) < 0)
+    {
+        perror("Accept");
+        exit(EXIT_FAILURE);
+    }
+
+    char *message2 = "Map";
+    send(sock , message2, strlen(message2) , 0 );
+
+return 0;
+}
+
+int stub() {
+    int obj_socket = 0, reader;
+    struct sockaddr_in serv_addr;
+    char buffer[1024]; // = {0};
+    if (( obj_socket = socket (AF_INET, SOCK_STREAM, 0 )) < 0)
+    {
+    std::printf ( "Socket creation error !" );
+    return -1;
+    }
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+    // Converting IPv4 and IPv6 addresses from text to binary form
+    if(inet_pton ( AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
+    {
+        printf ( "\nInvalid address ! This IP Address is not supported !\n" );
+        return -1;
+    }
+    if ( connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr )) < 0)
+    {
+        printf ( "Connection Failed : Can't establish a connection over this socket !" );
+        return -1;
+    }
+    while (1) {
+        reader = read ( obj_socket, buffer, 1024 );
+        if (reader != 0) {
+            if (!strcmp(buffer,"Map")) {
+                cout << "Run a Map instance\n";
+            }
+            else if (!strcmp(buffer,"Reduce")) {
+                cout << "Run a reduce instance\n";
+            }
+        }
+    }
+return 0;
+}
+
 
 int main(int argc, char *argv[]) {  // main is called with arguments from the command line
 
@@ -105,6 +203,13 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     }
     /* At this point all the directories a initialized */
 
+    /* Create a controller and stubs */
+
+    std::thread stub1(stub);
+    stub1.detach();
+    std::thread controller(controllerFunct);
+    controller.join();
+
     void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
     if(!mapPtr){
         cerr <<"Cannot load library: "<< dlerror() <<'\n';
@@ -120,6 +225,10 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         return 1;
     }
 
+
+//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
+//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
+
     // Lambda expression for a map thread
     auto mapFunctionThread = [&] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
         Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
@@ -127,10 +236,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
         fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
     };
-//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
-//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
- 
- /*** This block should be should be saved in a seperate file titled "partition" */
 
     // a loop to read input text in batches of size NumFiles/R
     for (int a = 1; a <= R; a++) {
@@ -146,7 +251,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
     mapThread.join();
     }
-/* end partition block */
 
 /**** Map completes  **/
 
