@@ -8,9 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(.)
 
 add_executable(OOD1
+        Controller.cpp
+        Controller.hpp
+        Stub.cpp
+        Stub.hpp
+        Messages.hpp
         FileIO.cpp
         FileIO.hpp
-        MapReduce_Phase3.cpp
+        MapReduce_Phase4.cpp
+        NetworkConstants.hpp
         Functions.cpp
         Functions.h)
 
