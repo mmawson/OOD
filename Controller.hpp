@@ -2,15 +2,20 @@
 
 #include <vector>
 
-class Controller
+namespace MapReduce
 {
-  public:
-    Controller();
 
-    ~Controller::Controller();
+  class Controller
+  {
+    public:
+      Controller();
 
-  private:
-    bool ConnectToStub(const size_t port);
+      ~Controller();
 
-    std::vector<int> mConnectedSockets;
-};
+    private:
+      bool ConnectToStub(const std::size_t port);
+
+      std::vector<int> mConnectedSockets;
+  };
+
+}//namespace MapReduce

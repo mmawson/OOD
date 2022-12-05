@@ -1,4 +1,7 @@
+#include "Stub.hpp"
+
 #include <iostream>
+#include "Messages.hpp"
 
 /* Socket Programming Libaries */
 #include <sys/socket.h>
@@ -10,40 +13,98 @@
 namespace MapReduce
 {
 
-  Stub::Stub()
+  Stub::Stub(const size_t port)
   {
-    int obj_socket = 0, reader;
-    struct sockaddr_in serv_addr;
-    char buffer[1024]; // = {0};
-    if (( obj_socket = socket (AF_INET, SOCK_STREAM, 0 )) < 0)
+    if (!ListenForConnection(port)) { std::cout << "Error when listening for connection" << std::endl; }
+
+    //Keep listening until the controller sends a termination message
+    bool terminate = false;
+    while (terminate == false)
     {
-      std::cout << "Socket creation error !" << std::endl;
-      return -1;
+      terminate = ListenForMessages();
     }
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-    // Converting IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton ( AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
+  }
+
+  Stub::~Stub()
+  {
+  }
+
+  bool Stub::ListenForConnection(const size_t port)
+  {
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+    
+    //Create socket file descriptor
+    if ((mListeningSocket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf ( "\nInvalid address ! This IP Address is not supported !\n" );
-        return -1;
+      perror("socket failed");
+      return false;
     }
-    if ( connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr )) < 0)
+
+    //Forcefully attahing socket to the port
+    if (setsockopt(mListeningSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
-        printf ( "Connection Failed : Can't establish a connection over this socket !" );
-        return -1;
+      perror("setsockopt"); 
+      return false;
     }
-    while (1) {
-        reader = read ( obj_socket, buffer, 1024 );
-        if (reader != 0) {
-            if (!strcmp(buffer,"Map")) {
-                cout << "Run a Map instance\n";
-            }
-            else if (!strcmp(buffer,"Reduce")) {
-                cout << "Run a reduce instance\n";
-            }
-        }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(port);
+
+    if (bind(mListeningSocket, (struct sockaddr*)&address, sizeof(address)) < 0)
+    {
+      perror("bind failed");
+      return false;
     }
+    if (listen(mListeningSocket, 3) < 0) 
+    {
+      perror("listen");
+      return false;
+    }
+
+    if ((mConnectedSocket = accept(mListeningSocket, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
+    {
+      perror("accept");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool Stub::ListenForMessages()
+  {
+    char buffer[1024] = { 0 };
+    int valread = read(mConnectedSocket, buffer, 1024); 
+
+    if (valread == 0)
+    {
+      return false;
+    }
+
+    //TODO: Take the appropriate actions after receiving these messages
+
+    ControllerMessage message;
+    message.Deserialize(buffer);
+
+    if (message.type == ControllerMessageType::CREATE_MAP_INSTANCE)
+    {
+      std::cout << "Got a message to create a map instance" << std::endl;
+      return false;
+    }
+    else if (message.type == ControllerMessageType::CREATE_REDUCE_INSTANCE)
+    {
+      std::cout << "Got a message to create a reduce instance" << std::endl;
+      return false;
+    }
+    else if (message.type == ControllerMessageType::TERMINATE_STUB)
+    {
+      std::cout << "Got a message to terminate this stub!" << std::endl;
+      return true;
+    }
+
+    return false;
   }
 
 

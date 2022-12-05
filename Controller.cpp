@@ -1,3 +1,5 @@
+#include "Controller.hpp"
+
 /* Socket Programming Libaries */
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -7,6 +9,9 @@
 
 #include "NetworkConstants.hpp"
 #include "Messages.hpp"
+
+#include <cstring>
+#include <iostream>
 
 namespace MapReduce
 {
@@ -20,20 +25,26 @@ namespace MapReduce
     ControllerMessage createMapMsg(ControllerMessageType::CREATE_MAP_INSTANCE);
     ControllerMessage createReduceMsg(ControllerMessageType::CREATE_REDUCE_INSTANCE);
 
-    send(mConnectedSockets[0], createMapMsg.type, strlen(createMapMsg.type), 0);
-    send(mConnectedSockets[1], createMapMsg.type, strlen(createMapMsg.type), 0);
-    send(mConnectedSockets[2], createMapMsg.type, strlen(createReduceMsg.type), 0);
-  }
+    send(mConnectedSockets[0], createMapMsg.Serialize(), sizeof(createMapMsg), 0);
+    send(mConnectedSockets[0], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
+    send(mConnectedSockets[1], createMapMsg.Serialize(), sizeof(createMapMsg), 0);
+    send(mConnectedSockets[2], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
 
-  ~Controller::Controller()
-  {
-    for (int socket_fd : mConnectedSockets)
+    while (true)
     {
-      socket_fd.close();
+      //Just stay alive until shut down
     }
   }
 
-  bool ConnectToStub(const size_t port)
+  Controller::~Controller()
+  {
+    for (int socket_fd : mConnectedSockets)
+    {
+      close(socket_fd);
+    }
+  }
+
+  bool Controller::ConnectToStub(const std::size_t port)
   {
     int sock = 0, valread, client_fd;
 
@@ -42,25 +53,28 @@ namespace MapReduce
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
       std::cout << "Socket creation error" << std::endl;
-      return -1;
+      return false;
     }
 
-    serv_addr.sin_familt = AF_INET;
+    serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
     if (inet_pton(AF_INET, STUB_IP_ADDRESS.c_str(), &serv_addr.sin_addr) <= 0)
     {
       std::cout << "Invalid address" << std::endl;
-      return -1;
+      return false;
     }
 
     if ((client_fd = connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) 
     {
       std::cout << "Connection Failed" << std::endl;
-      return -1;
+      return false;
     }
 
     mConnectedSockets.push_back(client_fd);
+    std::cout << "Connected on port " << port << std::endl;
+
+    return true;
   }
 
 }//namespace MapReduce

@@ -64,6 +64,9 @@ Art by Shanaka Dias
 #include "Functions.h"
 /* end local libraries */
 
+#include "Controller.hpp"
+#include "Stub.hpp"
+#include "NetworkConstants.hpp"
 
 
 /* library for using libraries*/
@@ -89,38 +92,73 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     pathToMapLib = "./lib/libmapNew.so";
     pathToReduceLib = "./lib/libreduceNew.so";
 
-    if (argc >= 2)
+    if (argc < 2)
     {
-        dir1 = filesystem::path(argv[1]);
+      std::cout << "Must pass at least one argument: controller or stub" << std::endl;
+      return -1;
     }
+
+    std::string controllerOrStubArg = argv[1];
+
+    std::size_t stubNum = 0;
     if (argc >= 3)
     {
-        dir2 = filesystem::path(argv[2]);
+      stubNum = stoi(argv[2]);
     }
+
     if (argc >= 4)
     {
-        dir3 = filesystem::path(argv[3]);
+        dir1 = filesystem::path(argv[3]);
     }
     if (argc >= 5)
     {
-        dir4 = filesystem::path(argv[4]);
+        dir2 = filesystem::path(argv[4]);
     }
     if (argc >= 6)
     {
-        pathToMapLib = std::string(argv[5]);
+        dir3 = filesystem::path(argv[5]);
     }
     if (argc >= 7)
     {
-        pathToReduceLib = std::string(argv[6]);
+        dir4 = filesystem::path(argv[6]);
     }
-    /* At this point all the directories a initialized */
+    if (argc >= 8)
+    {
+        pathToMapLib = std::string(argv[7]);
+    }
+    if (argc >= 9)
+    {
+        pathToReduceLib = std::string(argv[8]);
+    }
 
-    /* Create a controller and stubs */
+    /* At this point all the directories are initialized */
 
-    std::thread stub1(stub);
-    stub1.detach();
-    std::thread controller(controllerFunct);
-    controller.join();
+    /* Create a controller or stub */
+    if (controllerOrStubArg == "controller")
+    {
+      Controller controller;
+    }
+    else if (controllerOrStubArg == "stub")
+    {
+      std::size_t port = STUB_LISTEN_PORT1;
+      if (stubNum == 2)
+      {
+        port = STUB_LISTEN_PORT2;
+      }
+      else if (stubNum == 3)
+      {
+        port = STUB_LISTEN_PORT3;
+      }
+      Stub stub = Stub(port);
+    }
+    else 
+    {
+      std::cout << "First argument must be either controller or stub. Got " << controllerOrStubArg << " instead." << std::endl;
+      return -1;
+    }
+
+    //TODO: The below should be refactored and/or split up into the stub class
+
 
     void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
     if(!mapPtr){
