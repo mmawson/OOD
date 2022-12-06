@@ -70,6 +70,8 @@ namespace MapReduce
       return false;
     }
 
+    std::cout << "Created socket on port " << port << std::endl;
+
     return true;
   }
 

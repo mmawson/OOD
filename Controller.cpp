@@ -46,7 +46,7 @@ namespace MapReduce
 
   bool Controller::ConnectToStub(const std::size_t port)
   {
-    int sock = 0, valread, client_fd;
+    int sock = 0, valread;
 
     struct sockaddr_in serv_addr;
     
@@ -65,13 +65,13 @@ namespace MapReduce
       return false;
     }
 
-    if ((client_fd = connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) 
+    if ((connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) 
     {
       std::cout << "Connection Failed" << std::endl;
       return false;
     }
 
-    mConnectedSockets.push_back(client_fd);
+    mConnectedSockets.push_back(sock);
     std::cout << "Connected on port " << port << std::endl;
 
     return true;
