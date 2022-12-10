@@ -48,21 +48,34 @@ Art by Shanaka Dias
 // include some library files
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <cstdio>
 #include <filesystem>
 #include <thread>
+#include <map>
+#include <string>
+#include <string.h>
+
+/* local libraries */
 #include "FileIO.hpp"
 #include "Map.hpp"
 #include "Reduce.hpp"
 #include "DynamicLoader.h"
-#include <dlfcn.h>
 #include "Functions.h"
-#include <map>
-#include <string>
+/* end local libraries */
+
+#include "Controller.hpp"
+#include "Stub.hpp"
+#include "NetworkConstants.hpp"
+
+
+/* library for using libraries*/
+#include <dlfcn.h>
+
 
 // end libarary
 
 #define R 5 // R is the number buckets, Map threads, and reducer processes
-
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
 
@@ -79,31 +92,73 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     pathToMapLib = "./lib/libmapNew.so";
     pathToReduceLib = "./lib/libreduceNew.so";
 
-    if (argc >= 2)
+    if (argc < 2)
     {
-        dir1 = filesystem::path(argv[1]);
+      std::cout << "Must pass at least one argument: controller or stub" << std::endl;
+      return -1;
     }
+
+    std::string controllerOrStubArg = argv[1];
+
+    std::size_t stubNum = 0;
     if (argc >= 3)
     {
-        dir2 = filesystem::path(argv[2]);
+      stubNum = stoi(argv[2]);
     }
+
     if (argc >= 4)
     {
-        dir3 = filesystem::path(argv[3]);
+        dir1 = filesystem::path(argv[3]);
     }
     if (argc >= 5)
     {
-        dir4 = filesystem::path(argv[4]);
+        dir2 = filesystem::path(argv[4]);
     }
     if (argc >= 6)
     {
-        pathToMapLib = std::string(argv[5]);
+        dir3 = filesystem::path(argv[5]);
     }
     if (argc >= 7)
     {
-        pathToReduceLib = std::string(argv[6]);
+        dir4 = filesystem::path(argv[6]);
     }
-    /* At this point all the directories a initialized */
+    if (argc >= 8)
+    {
+        pathToMapLib = std::string(argv[7]);
+    }
+    if (argc >= 9)
+    {
+        pathToReduceLib = std::string(argv[8]);
+    }
+
+    /* At this point all the directories are initialized */
+
+    /* Create a controller or stub */
+    if (controllerOrStubArg == "controller")
+    {
+      Controller controller;
+    }
+    else if (controllerOrStubArg == "stub")
+    {
+      std::size_t port = STUB_LISTEN_PORT1;
+      if (stubNum == 2)
+      {
+        port = STUB_LISTEN_PORT2;
+      }
+      else if (stubNum == 3)
+      {
+        port = STUB_LISTEN_PORT3;
+      }
+      Stub stub = Stub(port);
+    }
+    else 
+    {
+      std::cout << "First argument must be either controller or stub. Got " << controllerOrStubArg << " instead." << std::endl;
+      return -1;
+    }
+
+    //TODO: The below should be refactored and/or split up into the stub class
+
 
     void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
     if(!mapPtr){
@@ -120,6 +175,10 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         return 1;
     }
 
+
+//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
+//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
+
     // Lambda expression for a map thread
     auto mapFunctionThread = [&] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
         Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
@@ -127,10 +186,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
         mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
         fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
     };
-//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
-//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
- 
- /*** This block should be should be saved in a seperate file titled "partition" */
 
     // a loop to read input text in batches of size NumFiles/R
     for (int a = 1; a <= R; a++) {
@@ -146,7 +201,6 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
     mapThread.join();
     }
-/* end partition block */
 
 /**** Map completes  **/
 
