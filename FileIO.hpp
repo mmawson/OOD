@@ -59,9 +59,9 @@ namespace MapReduce  // Using a cool namespace feature to keep member names from
         int fileCountFunct(std::filesystem::path);
         bool check(std::filesystem::path);   // This is checker function to ensure directories passed by user are validfunction checks 
         // member data
-        std::filesystem::path sourceDir;    // The Source Directory
-        std::filesystem::path tempDir;      // The Temporary Directory
-        std::filesystem::path outputDir;    // The Output Directory
+        std::filesystem::path sourceDir = filesystem::path("./text");    // The Source Directory
+        std::filesystem::path tempDir = filesystem::path("./temp");      // The Temporary Directory
+        std::filesystem::path outputDir = filesystem::path("./output");    // The Output Directory
         std::map<std::string, std::vector<int>> holdingMap; // sorted map of all keys from Map class
 //        std::vector<std::filesystem::path> inputFiles;  // this is a vector list of all files in sourceDir
         std::vector<std::string> tempFileLines;     // This is the tokenized temp file vector

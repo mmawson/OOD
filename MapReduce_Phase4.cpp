@@ -85,12 +85,12 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     std::string pathToMapLib, pathToReduceLib;
 
     //Default values
-    dir1 = filesystem::path("./text");  // all our directories are initialized with default settings
-    dir2 = filesystem::path("./temp");
-    dir3 = filesystem::path("./output");
-    dir4 = filesystem::path("./lib");
-    pathToMapLib = "./lib/libmapNew.so";
-    pathToReduceLib = "./lib/libreduceNew.so";
+//    dir1 = filesystem::path("./text");  // all our directories are initialized with default settings
+//    dir2 = filesystem::path("./temp");
+//    dir3 = filesystem::path("./output");
+//    dir4 = filesystem::path("./lib");
+//    pathToMapLib = "./lib/libmapNew.so";
+//    pathToReduceLib = "./lib/libreduceNew.so";
 
     if (argc < 2)
     {
@@ -106,30 +106,30 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
       stubNum = stoi(argv[2]);
     }
 
-    if (argc >= 4)
-    {
-        dir1 = filesystem::path(argv[3]);
-    }
-    if (argc >= 5)
-    {
-        dir2 = filesystem::path(argv[4]);
-    }
-    if (argc >= 6)
-    {
-        dir3 = filesystem::path(argv[5]);
-    }
-    if (argc >= 7)
-    {
-        dir4 = filesystem::path(argv[6]);
-    }
-    if (argc >= 8)
-    {
-        pathToMapLib = std::string(argv[7]);
-    }
-    if (argc >= 9)
-    {
-        pathToReduceLib = std::string(argv[8]);
-    }
+//    if (argc >= 4)
+//    {
+//        dir1 = filesystem::path(argv[3]);
+//    }
+//    if (argc >= 5)
+//    {
+//        dir2 = filesystem::path(argv[4]);
+//    }
+//    if (argc >= 6)
+//    {
+//        dir3 = filesystem::path(argv[5]);
+//    }
+//    if (argc >= 7)
+//    {
+//        dir4 = filesystem::path(argv[6]);
+//    }
+//    if (argc >= 8)
+//    {
+//        pathToMapLib = std::string(argv[7]);
+//    }
+//    if (argc >= 9)
+//    {
+//        pathToReduceLib = std::string(argv[8]);
+//    }
 
     /* At this point all the directories are initialized */
 
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
       }
       Stub stub = Stub(port);
     }
-    else 
+    else
     {
       std::cout << "First argument must be either controller or stub. Got " << controllerOrStubArg << " instead." << std::endl;
       return -1;
@@ -160,93 +160,93 @@ int main(int argc, char *argv[]) {  // main is called with arguments from the co
     //TODO: The below should be refactored and/or split up into the stub class
 
 
-    void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
-    if(!mapPtr){
-        cerr <<"Cannot load library: "<< dlerror() <<'\n';
-        return 1;
-    }
-    dlerror();
-//    maker_t defined in Functions class, declare as a pointer and typecast output of dlsym
-//    maker function creates new instance of map
-    maker_t *FuncMap = (maker_t *) dlsym(mapPtr, "maker");
-    const char* dlsym_error = dlerror();
-    if (dlsym_error) {
-        cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-        return 1;
-    }
-
-
-//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
-//    fileIO.toString();  // Print the name of the directories (input, temp, and output)
-
-    // Lambda expression for a map thread
-    auto mapFunctionThread = [&] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
-        Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
-        vector<string> mapOutput;
-        mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
-        fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
-    };
-
-    // a loop to read input text in batches of size NumFiles/R
-    for (int a = 1; a <= R; a++) {
-        // The FileIOManager class handles FileIO
-        MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
-        fileIO.populateFiles(a, R);  // This iteratively opens all the files in batch "a" in the input directory and 
-                             // saves the contents in a private string vector (tempFileLines) using a call to FileIOManager::read()
-                             // Now all the plays, poems, and sonnets are in one large string vector 
-        std::string mapOutputFile = "shakesTemp.txt" + to_string(a);
-    // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
-        auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
-    // Create a thread and pass it the  
-    std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
-    mapThread.join();
-    }
+//    void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
+//    if(!mapPtr){
+//        cerr <<"Cannot load library: "<< dlerror() <<'\n';
+//        return 1;
+//    }
+//    dlerror();
+////    maker_t defined in Functions class, declare as a pointer and typecast output of dlsym
+////    maker function creates new instance of map
+//    maker_t *FuncMap = (maker_t *) dlsym(mapPtr, "maker");
+//    const char* dlsym_error = dlerror();
+//    if (dlsym_error) {
+//        cerr << "Cannot load symbol create: " << dlsym_error << '\n';
+//        return 1;
+//    }
+//
+//
+////    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);
+////    fileIO.toString();  // Print the name of the directories (input, temp, and output)
+//
+//    // Lambda expression for a map thread
+//    auto mapFunctionThread = [&] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
+//        Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
+//        vector<string> mapOutput;
+//        mapOutput = map1->mapToOutputFile(fileIoPtr->getTempFileLines());  // the thread gets the files and maps the string tokens
+//        fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
+//    };
+//
+//    // a loop to read input text in batches of size NumFiles/R
+//    for (int a = 1; a <= R; a++) {
+//        // The FileIOManager class handles FileIO
+//        MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
+//        fileIO.populateFiles(a, R);  // This iteratively opens all the files in batch "a" in the input directory and
+//                             // saves the contents in a private string vector (tempFileLines) using a call to FileIOManager::read()
+//                             // Now all the plays, poems, and sonnets are in one large string vector
+//        std::string mapOutputFile = "shakesTemp.txt" + to_string(a);
+//    // Map. whose job it is to take text lines passed to it and properly format them for the Reduce class to use
+//        auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
+//    // Create a thread and pass it the
+//    std::thread mapThread(mapFunctionThread, filePtr, mapOutputFile);
+//    mapThread.join();
+//    }
 
 /**** Map completes  **/
 
-//  Lambda for Reduce
-    auto reduceFunctionThread = [&] (auto fileIoPtr, string reduceInputFile, int b) { //  pointer to type Functions to allow access to all derived functions
-        fileIoPtr->sortMap(reduceInputFile);
-        auto holdingMap = fileIoPtr->getHoldingMap();
-
-        // open .so file and assign to void pointer, RTLD_LAZY binds functions as called
-
-        void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
-        if(!reducePtr){
-            cerr <<"Cannot load library: "<< dlerror() <<'\n';
-            return 1;
-        }
-        dlerror();
-        maker_tRed *FuncReduce = (maker_tRed*) dlsym(reducePtr, "makerRed");
-        const char* dlsym_error1 = dlerror();
-        if (dlsym_error1) {
-            cerr << "Cannot load symbol create: " << dlsym_error << '\n';
-            return 1;
-        }
-        Functions* reduce1 = FuncReduce(fileIoPtr);
-        vector<string> reduceOutput;
-        reduce1->reduceFile(holdingMap);
-        reduceOutput = reduce1->writeReduce();
-        // If b == R we are processing our last temp file and saving SUCCESS.txt
-        if (b == R) {
-            fileIoPtr->save(reduceOutput,"SUCCESS.txt", fileIoPtr->getOutputDir());
-        }
-        // If b!=R we are saving bucket r to file
-        else {
-            fileIoPtr->save(reduceOutput,"reducedPiece" + to_string(b) + ".txt", fileIoPtr->getOutputDir());
-        }
-        return 0;
-    };
-
-// Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
-    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
-    auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
-    for (int b = 1; b <= R; b++) {
-        // The FileIOManager class handles FileIO
-        std::string reduceInputFile = "shakesTemp.txt" + to_string(b);
-        std::thread reduceThread(reduceFunctionThread, filePtr, reduceInputFile, b);
-        reduceThread.join();
-    }
+////  Lambda for Reduce
+//    auto reduceFunctionThread = [&] (auto fileIoPtr, string reduceInputFile, int b) { //  pointer to type Functions to allow access to all derived functions
+//        fileIoPtr->sortMap(reduceInputFile);
+//        auto holdingMap = fileIoPtr->getHoldingMap();
+//
+//        // open .so file and assign to void pointer, RTLD_LAZY binds functions as called
+//
+//        void* reducePtr = dlopen(pathToReduceLib.c_str(), RTLD_LAZY);
+//        if(!reducePtr){
+//            cerr <<"Cannot load library: "<< dlerror() <<'\n';
+//            return 1;
+//        }
+//        dlerror();
+//        maker_tRed *FuncReduce = (maker_tRed*) dlsym(reducePtr, "makerRed");
+//        const char* dlsym_error1 = dlerror();
+//        if (dlsym_error1) {
+//            cerr << "Cannot load symbol create: " << dlsym_error1 << '\n';
+//            return 1;
+//        }
+//        Functions* reduce1 = FuncReduce(fileIoPtr);
+//        vector<string> reduceOutput;
+//        reduce1->reduceFile(holdingMap);
+//        reduceOutput = reduce1->writeReduce();
+//        // If b == R we are processing our last temp file and saving SUCCESS.txt
+//        if (b == R) {
+//            fileIoPtr->save(reduceOutput,"SUCCESS.txt", fileIoPtr->getOutputDir());
+//        }
+//        // If b!=R we are saving bucket r to file
+//        else {
+//            fileIoPtr->save(reduceOutput,"reducedPiece" + to_string(b) + ".txt", fileIoPtr->getOutputDir());
+//        }
+//        return 0;
+//    };
+//
+//// Reduce, whose job it is to take text lines passed to it and tabulate into a count of instances which is saved to disk
+//    MapReduce::FileIOManager fileIO(dir1, dir2, dir3);  // creates a FileIOManager object
+//    auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
+//    for (int b = 1; b <= R; b++) {
+//        // The FileIOManager class handles FileIO
+//        std::string reduceInputFile = "shakesTemp.txt" + to_string(b);
+//        std::thread reduceThread(reduceFunctionThread, filePtr, reduceInputFile, b);
+//        reduceThread.join();
+//    }
 
 
 //    Reduce reduce1(filePtr);                   // creates a Reduce object
