@@ -1,3 +1,11 @@
+
+
+//Constructor for Wips objects that initializes all the private data members 
+//Input: Void
+//Output: Wips objects initialized
+//Functionality Usage: To create Wips objects. All registers and memory is initialized to 0. 
+
+
 #include "Stub.hpp"
 
 #include <iostream>
@@ -20,6 +28,10 @@
 namespace MapReduce
 {
 
+//Constructor for Stub objects
+//Input: Port Identifier
+//Output: A Stub object
+//Functionality Usage: To create Stub objects and start them listening on a port
   Stub::Stub(const size_t port)
   {
     if (!ListenForConnection(port)) { std::cout << "Error when listening for connection" << std::endl; }
@@ -36,6 +48,10 @@ namespace MapReduce
   {
   }
 
+//ListenForConnection
+//Input: Port Identifier
+//Output: A listening socket
+//Functionality Usage: Used to create a listening socket or send error if no socket can be created
   bool Stub::ListenForConnection(const size_t port)
   {
     struct sockaddr_in address;
@@ -49,7 +65,7 @@ namespace MapReduce
       return false;
     }
 
-    //Forcefully attahing socket to the port
+    //Forcefully attaching socket to the port
     if (setsockopt(mListeningSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
       perror("setsockopt"); 
@@ -82,6 +98,10 @@ namespace MapReduce
     return true;
   }
 
+//ListenForMessages
+//Input: Socket message: Map, Reduce, or Terminate
+//Output: A Map process, Reduce process, or Stub terminate
+//Functionality Usage: Processes messages sent via a socket to manage creation and termination of processes
   bool Stub::ListenForMessages()
   {
     char buffer[1024] = { 0 };
@@ -118,6 +138,10 @@ namespace MapReduce
     return false;
   }
 
+//accessMapLib
+//Input: Map Library
+//Output: A new instance of Map
+//Functionality Usage: Used to open the .so Map library which has the defintion of the Map class and return an new instance of Map
   maker_t* Stub::accessMapLib() {
       std::string pathToMapLib = "./lib/libmapNew.so";
         void* mapPtr = dlopen(pathToMapLib.c_str(), RTLD_LAZY);
@@ -135,7 +159,10 @@ namespace MapReduce
         return tempFuncMap;
     }
 
-
+//mapFunctionThread
+//Input: A FileIO object pointer 
+//Output: String tokens in a file
+//Functionality Usage: Used to process text input, tokenize the input, and save it to a file
     auto mapFunctionThread = [] (auto fileIoPtr, string mapOutputFileName) { //  pointer to type Functions to allow access to all derived functions
         maker_t* FuncMap = Stub::accessMapLib();
         Functions* map1 = FuncMap(fileIoPtr, mapOutputFileName); // create a map object with a handel to the FileIOManager
@@ -144,6 +171,10 @@ namespace MapReduce
         fileIoPtr->save(mapOutput,mapOutputFileName,fileIoPtr->getTempDir());  // saves the tokens in a temp file
     };
 
+//mapProcess
+//Input: The number of partitions (R) of the data which is also the number of buckets the data will be split into and the number of Map Process's to be created 
+//Output: R Map process threads
+//Functionality Usage: Read the Shakespearean text files, tokenize them, and save them to a temp directory for the Reduce Process(s)
   void Stub::mapProcess(){
     for (int a = 1; a <= R; a++) {
         // The FileIOManager class handles FileIO
@@ -161,6 +192,10 @@ namespace MapReduce
     }
 }
 
+//reduceFunctionThread
+//Input: A FileIO pointer with the contents of the tokenized temp files
+//Output: Tokenized output files which contain the number of occurences of string tokens produced by the Map files
+//Functionality Usage: Create a thread to perform the Reduce algorithm
     auto reduceFunctionThread = [] (auto fileIoPtr, string reduceInputFile, int b) { //  pointer to type Functions to allow access to all derived functions
       int R = 2;
       std::string pathToReduceLib = "./lib/libreduceNew.so";
@@ -196,6 +231,10 @@ namespace MapReduce
         return 0;
     };
 
+//reduceProcess
+//Input: Void
+//Output: R Reduce threads
+//Functionality Usage: Spawns Reduce threads to parse the output text created by Map threads
     void Stub::reduceProcess(){
     MapReduce::FileIOManager fileIO;  // creates a FileIOManager object
     auto filePtr = make_shared<MapReduce::FileIOManager>(fileIO);  // create shared pointer to pass to map object
