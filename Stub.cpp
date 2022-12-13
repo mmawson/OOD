@@ -1,11 +1,3 @@
-
-
-//Constructor for Wips objects that initializes all the private data members 
-//Input: Void
-//Output: Wips objects initialized
-//Functionality Usage: To create Wips objects. All registers and memory is initialized to 0. 
-
-
 #include "Stub.hpp"
 
 #include <iostream>
@@ -25,9 +17,10 @@
 #include <thread>
 /* End Socket Programing Libraries */
 
+const int R = 5;
+
 namespace MapReduce
 {
-
 //Constructor for Stub objects
 //Input: Port Identifier
 //Output: A Stub object
@@ -120,7 +113,7 @@ namespace MapReduce
     if (message.type == ControllerMessageType::CREATE_MAP_INSTANCE)
     {
       std::cout << "Got a message to create a map instance" << std::endl;
-      mapProcess();
+      mapProcess(R);
       return false;
     }
     else if (message.type == ControllerMessageType::CREATE_REDUCE_INSTANCE)
@@ -175,8 +168,8 @@ namespace MapReduce
 //Input: The number of partitions (R) of the data which is also the number of buckets the data will be split into and the number of Map Process's to be created 
 //Output: R Map process threads
 //Functionality Usage: Read the Shakespearean text files, tokenize them, and save them to a temp directory for the Reduce Process(s)
-  void Stub::mapProcess(){
-    for (int a = 1; a <= R; a++) {
+  void Stub::mapProcess(int bucket){
+    for (int a = 1; a <= bucket; a++) {
         // The FileIOManager class handles FileIO
           // creates a FileIOManager object
         MapReduce::FileIOManager fileIO;
@@ -197,7 +190,6 @@ namespace MapReduce
 //Output: Tokenized output files which contain the number of occurences of string tokens produced by the Map files
 //Functionality Usage: Create a thread to perform the Reduce algorithm
     auto reduceFunctionThread = [] (auto fileIoPtr, string reduceInputFile, int b) { //  pointer to type Functions to allow access to all derived functions
-      int R = 2;
       std::string pathToReduceLib = "./lib/libreduceNew.so";
         fileIoPtr->sortMap(reduceInputFile);
         auto holdingMap = fileIoPtr->getHoldingMap();

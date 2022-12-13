@@ -25,10 +25,20 @@ namespace MapReduce
     ControllerMessage createMapMsg(ControllerMessageType::CREATE_MAP_INSTANCE);
     ControllerMessage createReduceMsg(ControllerMessageType::CREATE_REDUCE_INSTANCE);
 
-    send(mConnectedSockets[0], createMapMsg.Serialize(), sizeof(createMapMsg), 0);
-    send(mConnectedSockets[0], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
-    send(mConnectedSockets[1], createMapMsg.Serialize(), sizeof(createMapMsg), 0);
-    send(mConnectedSockets[2], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
+/*********** Must have already run "program.out stub 1 &" ***************/
+/*********** the following command tellls stub 1 to make a Map thread and map the files ****/
+    send(mConnectedSockets[0], createMapMsg.Serialize(), sizeof(createMapMsg), 0);    
+//  Jedi Mind Trick here
+    sleep(10);  // In between the time it takes to map the files we need a pause for the map to finish before we serialize
+/*********** Must have already run "program.out stub 2 &" **************/
+/*********** the following command tellls stub 1 to make a Map thread and map the files ****/
+    send(mConnectedSockets[1], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
+
+/*    These commands can be uncommented to add another socket or more map and reduce threads */
+//    send(mConnectedSockets[0], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
+//    send(mConnectedSockets[1], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
+//    send(mConnectedSockets[2], create.Serialize(), sizeof(createReduceMsg), 0);
+//    send(mConnectedSockets[2], createReduceMsg.Serialize(), sizeof(createReduceMsg), 0);
 
     while (true)
     {

@@ -75,7 +75,7 @@ Art by Shanaka Dias
 
 // end libarary
 
-#define R 5 // R is the number buckets, Map threads, and reducer processes
+// #define R 4 // R is the number buckets, Map threads, and reducer processes
 using namespace MapReduce;  // This will keep collisions between other peoples classes, functions, variables, etc. of the same name from happening
 using namespace std;
 
